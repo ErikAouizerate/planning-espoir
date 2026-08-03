@@ -76,6 +76,22 @@ Names are trimmed (whitespace stripped), so `Anais Bouyssounaîs ` and `Anais Bo
 
 Known consequence: the real file spells `Céline PREAU` in `S1` and `Céline PREAULT` in `S2`–`S6`; index-based matching assigns both spellings to the single `S1` person `Céline PREAU`, so the dropdown shows **one** Céline.
 
+### D11: Uploaded file name persisted and displayed
+
+The original uploaded file name is stored in `config.json` as `fileName` (pre-filled on upload, kept across consultations) and returned by `GET /planning/config`. The webapp shows it as a subtitle in the header.
+
+### D12: Config modal rework
+
+- **Default name**: chosen from a dropdown listing the people of the planning (with an "Aucun" option to clear), instead of a free-text input.
+- **Start date**: the modal shows a label "La semaine 1 correspond à la semaine du lundi <date>" and lets the user pick the reference week by selecting one of the **Mondays of a month**, with a dedicated month navigator inside the modal. The month initially shown is the month of the current `startDate` if set, otherwise the current month. The current `startDate` is pre-selected (the store re-fetches config after upload so the value is fresh).
+
+### D13: Month label, fonts, responsiveness, grid lines
+
+- The displayed month is formatted as a French label (e.g. `août 2026`) in the header and shown above the calendar grid.
+- Google Fonts **Merriweather Sans** (titles) and **Nunito** (content) are bundled via `@fontsource` packages.
+- The calendar is responsive on small screens (day cells shrink, font sizes reduce, no forced horizontal overflow).
+- Day cells are separated by discreet light-gray grid lines.
+
 ## Architecture
 
 ```
@@ -83,8 +99,8 @@ webapp (React + Vite + Tailwind, SPA)
   ├─ POST /planning            upload .xlsx
   ├─ GET  /planning            people + colors + startDate
   ├─ GET  /planning/schedule?month=YYYY-MM
-  ├─ GET  /planning/config     startDate + defaultName
-  └─ PUT  /planning/config     update startDate / defaultName
+  ├─ GET  /planning/config     startDate + defaultName + fileName
+  └─ PUT  /planning/config     update startDate / defaultName / fileName
 ```
 
 - Monorepo with yarn workspaces; `webapp/` = React + Vite SPA, `api/` = NestJS backend.
@@ -95,7 +111,7 @@ webapp (React + Vite + Tailwind, SPA)
 
 - `data/planning.xlsx` — the uploaded source file.
 - `data/planning.json` — normalized parsed model (Approach A).
-- `data/config.json` — `{ startDate, defaultName }` flat config shared by all users.
+- `data/config.json` — `{ startDate, defaultName, fileName }` flat config shared by all users.
 
 ## Data model
 
@@ -142,8 +158,8 @@ The effective `startDate` used for rotation is stored **only** in `config.json` 
 | `POST` | `/planning` | Multipart `.xlsx` upload. Parse → write `planning.json` + keep `planning.xlsx`. Read sheet name → pre-fill `startDate` in `config.json`. 400 if not a valid `.xlsx` or no `S1`..`S6` block found. |
 | `GET` | `/planning` | Returns `{ startDate, people }` (names + roles + colors). 404 if no planning uploaded. |
 | `GET` | `/planning/schedule?month=YYYY-MM` | Returns the full month schedule for all people (date→week resolved via rotation). 404 if no planning uploaded; 400 if `month` malformed. |
-| `GET` | `/planning/config` | Returns `{ startDate, defaultName }`. |
-| `PUT` | `/planning/config` | Updates `startDate` and/or `defaultName` in the flat file. |
+| `GET` | `/planning/config` | Returns `{ startDate, defaultName, fileName }`. |
+| `PUT` | `/planning/config` | Updates `startDate`, `defaultName` and/or `fileName` in the flat file. |
 
 Responses:
 - `schedule` → `{ month, days: { "YYYY-MM-DD": PersonDay[] } }` where `PersonDay = { name, colorIndex, cell: DayCell }`.
@@ -155,23 +171,26 @@ Responses:
 
 One page only.
 
-- **Header**: title; multi-select dropdown of people (checkboxes; no pre-selection); month navigation (previous/next; current month by default); "Import" upload button/zone; "Settings" button (modal).
-- **Body**: monthly grid (7 columns × 5-6 rows). Each day cell stacks the selected people, in selection order:
+- **Header**: title + uploaded file name subtitle; multi-select dropdown of people (checkboxes; no pre-selection); month navigation (previous/next; current month by default) with a French month label (e.g. `août 2026`); "Import" upload button/zone; "Settings" button (modal).
+- **Body**: month label heading; monthly grid (7 columns × 5-6 rows, responsive on small screens, day cells separated by light-gray grid lines). Each day cell stacks the selected people, in selection order:
   - shift: time range(s) such as `09:00 – 13:00` and `13:30 – 17:30`, with a dot/badge in the person's color.
   - off: colored badge with the cell text (e.g. `rh`) in the person's color.
   - none: empty.
 - **Legend**: selected people with their color swatch.
+- **Fonts**: Merriweather Sans for titles, Nunito for content (bundled via `@fontsource`).
+- **Dropdowns** (people selector, config default-name selector) close on outside click.
 
 ### Redux constraints (non-negotiable)
 
 - Tailwind CSS.
 - Redux with custom middlewares and plain classic reducers — no Redux Thunk, no slices, no `createReducer`.
 - Custom middleware for API calls (request/success/failure pattern).
-- State slices: `planning` (startDate, people, status), `schedule` (displayed month + month data), `selection` (selected names), `config` (editable startDate, defaultName), `colors` (palette + per-person colorIndex).
+- State slices: `planning` (startDate, people, status), `schedule` (displayed month + month data), `selection` (selected names), `config` (editable startDate, defaultName, fileName), `colors` (palette + per-person colorIndex).
 
 ### Config modal
 
-- Editable `startDate` (pre-filled from the Excel, correctable) and `defaultName`.
+- **Default name**: dropdown listing the people of the planning (plus "Aucun" to clear).
+- **Start date**: label "La semaine 1 correspond à la semaine du lundi <date>" + a picker of the **Mondays of a month** (each Monday = the reference week), with a dedicated month navigator; the current `startDate` is pre-selected.
 - Changes are persisted via `PUT /planning/config`; the calendar re-resolves the rotation without re-uploading.
 
 ## Error handling
