@@ -7,6 +7,7 @@ describe('Health (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
+    process.env.AUTH_ENABLED = 'false';
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();

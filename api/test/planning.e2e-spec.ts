@@ -14,6 +14,7 @@ describe('Planning (e2e)', () => {
   beforeAll(async () => {
     dataDir = await mkdtemp(join(tmpdir(), 'planning-e2e-'));
     process.env.DATA_DIR = dataDir;
+    process.env.AUTH_ENABLED = 'false';
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
