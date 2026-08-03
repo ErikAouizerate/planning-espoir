@@ -32,6 +32,7 @@ export interface Action<T = string, P = unknown> {
   type: T;
   payload?: P;
   error?: string;
+  [key: string]: unknown;
 }
 
 export function planningFetchRequested(): Action<typeof PLANNING_FETCH_REQUESTED> {
