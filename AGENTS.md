@@ -6,7 +6,7 @@ Communication with the user is in French; all code, documentation, and tests in 
 
 ## Repo state
 
-Greenfield — no code and no commits yet. The only committed content is this file plus `docs/` and the git history as they grow. The "Architecture" and "Commands" sections below are the target contract, not yet present in the tree. `docs/adr/` is planned but the ADR files do not exist yet.
+Greenfield — no code and no commits yet. The only committed content is this file plus `docs/` and the git history as they grow. The "Architecture" and "Commands" sections below are the target contract, not yet present in the tree. `docs/adr/` is planned but the ADR files do not exist yet. An implementation plan exists at `docs/superpowers/plans/2026-08-03-planning-espoir.md` and is the reference for the first build.
 
 ## Workflow (superpowers)
 
@@ -22,9 +22,9 @@ Confirm any architecture change with the user before committing to it.
 
 ## Target architecture (validated)
 
-- Monorepo with yarn workspaces; `webapp/` = React + Vite SPA, `api/` = NestJS backend. Root `package.json` defines the workspace.
+- Monorepo with yarn workspaces: `shared/` = cross-package domain types, `webapp/` = React + Vite SPA, `api/` = NestJS backend. Root `package.json` defines the workspace.
 - Deployable with Docker + docker-compose.
-- No database: the date ↔ template-week correlation and the default user name are stored as flat files (shared by all users).
+- No database: the date ↔ template-week correlation and the default user name are stored as flat files (shared by all users). The API stores the uploaded `.xlsx` plus a normalized JSON model under a `DATA_DIR` (default `./data`).
 - One page only; a dropdown lists all available names (multi-select allowed), default name comes from the flat file.
 - Auth: Keycloak via OIDC — design for it, do not implement yet (details TBD).
 
@@ -38,7 +38,7 @@ Confirm any architecture change with the user before committing to it.
 Run from the repo root (yarn workspaces):
 
 - `yarn install` — install all workspace dependencies
-- `yarn dev` — Vite dev server (port 5173), requires Keycloak running
+- `yarn dev` — Vite dev server (port 5173) + API dev server, requires Keycloak running
 - `yarn test` / `yarn lint` / `yarn typecheck` / `yarn build` — per-package checks
 
 ## Decision history
