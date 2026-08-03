@@ -1004,3 +1004,7 @@ No TODOs/TBDs. All code blocks are complete.
 - `KeycloakApi { init, isEnabled, getToken, getUsername, signout }` — Task 2 defines and consumes.
 - `AuthState`/`auth` slice — Task 2 types/reducers/combine consistent.
 - `fetchAuthMe(): Promise<{ username: string }>` — Task 2 client defines, middleware consumes.
+
+## Addendum — Group-based access control (D-AUTH-9)
+
+Implemented after the initial plan: `AuthGuard` now requires the token's `groups` claim to include `app-planning-espoir` (constant `APP_GROUP` in `api/src/auth/auth.guard.ts`); otherwise it throws `ForbiddenException` (403). In mock mode (auth disabled) groups are ignored. Added unit tests in `auth.guard.spec.ts` for: valid token in group → 200; valid token not in group → 403; missing groups claim → 403. Spec updated with D-AUTH-9.

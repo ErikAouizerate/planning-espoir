@@ -67,6 +67,10 @@ The `auth` state is a **plain classic reducer** added to the existing `combineRe
 
 The webapp stays on port **5174**. The user updates the Keycloak client `redirectUris`/`webOrigins` accordingly (already done by the user).
 
+### D-AUTH-9: Group-based access control
+
+The API guard authorizes only users belonging to the `app-planning-espoir` Keycloak group. The realm's `groups` protocol mapper puts the group list in the token's `groups` claim; the guard checks that claim contains `app-planning-espoir` and otherwise rejects with **403** (`ForbiddenException`). In mock mode (auth disabled), the guard passes regardless of groups. This applies to all API routes via the global guard.
+
 ## Architecture
 
 ```
@@ -78,7 +82,9 @@ webapp (5174)
 
 api (3000)
   AuthGuard (custom, jose + jwks-rsa)
-    AUTH_ENABLED=true  → validate JWT vs realm JWKS → request.user = { username }
+    AUTH_ENABLED=true  → validate JWT vs realm JWKS
+                          → check groups claim contains 'app-planning-espoir' (else 403)
+                          → request.user = { username }
     AUTH_ENABLED=false → pass, request.user = { username: 'test-user' }
   AuthModule: GET /api/auth/me → { username }
   PlanningModule routes protected by the guard when enabled
@@ -128,13 +134,14 @@ Realm `gateway` (user-maintained): client `gateway` public, PKCE S256, `redirect
 ## Error handling
 
 - Enabled auth, missing/invalid/expired token → **401** `{ statusCode, message }`.
+- Enabled auth, valid token but user not in the `app-planning-espoir` group → **403**.
 - Enabled auth, realm/JWKS unreachable or key resolution failure → **503**.
 - Webapp client on 401 with auth enabled → re-run keycloak login flow (redirect to Keycloak).
 - Mock mode: no token sent, guard passes, identity is `test-user`.
 
 ## Testing
 
-- **API unit**: `AuthGuard` — enabled with a valid token (mocked JWKS/key verify) sets `request.user.username` from `preferred_username`; enabled with invalid/missing token → 401; disabled → passes with `test-user`. `identity` helper: token→`preferred_username`, null→`test-user`.
+- **API unit**: `AuthGuard` — enabled with a valid token (mocked JWKS/key verify) in the `app-planning-espoir` group sets `request.user.username` from `preferred_username`; valid token not in the group → 403; missing `groups` claim → 403; invalid/missing token → 401; disabled → passes with `test-user`. `identity` helper: token→`preferred_username`, null→`test-user`.
 - **API e2e**: `GET /api/auth/me` with `AUTH_ENABLED=false` → `{ username: 'test-user' }`; with `AUTH_ENABLED=true` and no/invalid token → 401; planning routes 401 when enabled + no token, 200 when disabled.
 - **Webapp**: `authReducer` (request/success/error transitions); `Header` shows username and renders a disabled Signout in mock mode; `keycloak.ts` mock-mode behavior (`getUsername()` → `test-user`, `signout()` no-op); client attaches the Bearer header when a token is present.
 - Lint + typecheck on both packages; root command set unchanged.
@@ -142,4 +149,3 @@ Realm `gateway` (user-maintained): client `gateway` public, PKCE S256, `redirect
 ## Open items
 
 - The realm client config update (`redirectUris` → 5174) is performed manually by the user.
-- Group/role-based access is out of scope.

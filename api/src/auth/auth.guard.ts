@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   ServiceUnavailableException,
   UnauthorizedException,
@@ -8,6 +9,8 @@ import {
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { JWTClaimValidationFailed, JWTExpired, JWSSignatureVerificationFailed } from 'jose/errors';
 import { MOCK_USERNAME } from './identity';
+
+export const APP_GROUP = 'app-planning-espoir';
 
 export interface AuthenticatedRequest extends Request {
   headers: Record<string, string | undefined> & Request['headers'];
@@ -51,11 +54,15 @@ export class AuthGuard implements CanActivate {
       const { payload } = await jwtVerify(token, this.jwks as never, {
         issuer: this.options.issuer,
       });
+      const groups = (payload.groups as string[] | undefined) ?? [];
+      if (!groups.includes(APP_GROUP)) {
+        throw new ForbiddenException('User is not allowed to access this application');
+      }
       const username = (payload.preferred_username as string | undefined) ?? null;
       request.user = { username: username ?? MOCK_USERNAME };
       return true;
     } catch (error) {
-      if (error instanceof UnauthorizedException) throw error;
+      if (error instanceof ForbiddenException) throw error;
       if (
         error instanceof JWTExpired ||
         error instanceof JWTClaimValidationFailed ||

@@ -1,5 +1,6 @@
 import {
   ExecutionContext,
+  ForbiddenException,
   ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -63,12 +64,30 @@ describe('AuthGuard', () => {
     ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
-  it('sets request.user from preferred_username when a valid token verifies', async () => {
-    mockJwtVerify.mockResolvedValue({ payload: { preferred_username: 'admin@example.com' } });
+  it('sets request.user from preferred_username when a valid token is in the app group', async () => {
+    mockJwtVerify.mockResolvedValue({
+      payload: { preferred_username: 'admin@example.com', groups: ['app-planning-espoir'] },
+    });
     const ctx = makeContext({ authorization: 'Bearer abc.def.ghi' });
     await expect(enabledGuard().canActivate(ctx)).resolves.toBe(true);
     const req = ctx.switchToHttp().getRequest() as { user?: { username: string } };
     expect(req.user).toEqual({ username: 'admin@example.com' });
+  });
+
+  it('throws 403 when a valid token is not in the app group', async () => {
+    mockJwtVerify.mockResolvedValue({
+      payload: { preferred_username: 'user@example.com', groups: ['app-invoices'] },
+    });
+    await expect(
+      enabledGuard().canActivate(makeContext({ authorization: 'Bearer abc.def.ghi' })),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+  });
+
+  it('throws 403 when a valid token has no groups claim', async () => {
+    mockJwtVerify.mockResolvedValue({ payload: { preferred_username: 'user@example.com' } });
+    await expect(
+      enabledGuard().canActivate(makeContext({ authorization: 'Bearer abc.def.ghi' })),
+    ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it('throws 401 when the token is expired', async () => {
