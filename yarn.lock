@@ -509,6 +509,16 @@
     lodash.isundefined "^3.0.1"
     lodash.uniq "^4.5.0"
 
+"@fontsource/merriweather-sans@5.3.0":
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/@fontsource/merriweather-sans/-/merriweather-sans-5.3.0.tgz#1556d97a60d0905c723e2a7e6291ac6e68c80245"
+  integrity sha512-l8E8wze9DdaDPMmRp8fm4ucMKqLl/rXksrGqxKO6YVtKtt15wRbkcVEmxYNffFMQnEp39G7hKiypRWfVYTbW5w==
+
+"@fontsource/nunito@5.3.0":
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/@fontsource/nunito/-/nunito-5.3.0.tgz#6369caf65492f89cf1c937fc5c153b44128fa527"
+  integrity sha512-vw9TaTQJ/zpEpKrsODuPmOvaVjXgdda6B+xXA4YqjrdeJ62MLgVoDerdRXFQHyBnSCt2yQ2nHKCHPP/Pv7Xq4Q==
+
 "@humanfs/core@^0.19.2":
   version "0.19.2"
   resolved "https://registry.yarnpkg.com/@humanfs/core/-/core-0.19.2.tgz#a8272ca03b2acf492670222b2320b6c421bfde60"

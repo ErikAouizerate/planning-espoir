@@ -12,6 +12,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/merriweather-sans": "5.3.0",
+    "@fontsource/nunito": "5.3.0",
     "@planning-espoir/shared": "*",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
