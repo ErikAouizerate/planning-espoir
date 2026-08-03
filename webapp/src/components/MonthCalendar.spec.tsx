@@ -90,6 +90,6 @@ describe('MonthCalendar', () => {
     );
     const cell = document.querySelector(`[data-testid="day-${today}"]`);
     expect(cell).toBeInTheDocument();
-    expect(cell?.className).toContain('bg-blue-50');
+    expect(cell?.className).toContain('bg-blue-200');
   });
 });
