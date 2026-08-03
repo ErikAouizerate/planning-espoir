@@ -38,7 +38,7 @@ Confirm any architecture change with the user before committing to it.
 Run from the repo root (yarn workspaces):
 
 - `yarn install` — install all workspace dependencies
-- `yarn dev` — Vite dev server (port 5173) + API dev server, requires Keycloak running
+- `yarn dev` — Vite dev server (port 5174) + API dev server (port 3000), requires Keycloak running
 - `yarn test` / `yarn lint` / `yarn typecheck` / `yarn build` — per-package checks
 
 ## Decision history

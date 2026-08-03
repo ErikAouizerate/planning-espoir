@@ -1494,7 +1494,7 @@ Set up the Vite + React + TypeScript + Tailwind SPA with a working smoke test an
 
 **Interfaces:**
 - Consumes: `@planning-espoir/shared` (dist types).
-- Produces: Vite dev server on port 5173, proxy `/api` → `http://localhost:3000`, Tailwind v4 loaded via `@tailwindcss/vite`, vitest configured with jsdom.
+- Produces: Vite dev server on port 5174, proxy `/api` → `http://localhost:3000`, Tailwind v4 loaded via `@tailwindcss/vite`, vitest configured with jsdom.
 
 - [ ] **Step 1: Create `webapp/package.json`**
 
@@ -1569,7 +1569,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    port: 5173,
+    port: 5174,
     proxy: {
       '/api': 'http://localhost:3000',
     },
