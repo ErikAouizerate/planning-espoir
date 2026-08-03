@@ -72,4 +72,38 @@ describe('parsePlanning', () => {
     expect(parsed.warnings.length).toBeGreaterThan(0);
     expect(parsed.warnings[0].value).toBe('9?30');
   });
+
+  it('parses an rh text cell in a day as an off cell', async () => {
+    const workbook = new ExcelJS.Workbook();
+    const ws = workbook.addWorksheet('A compter du 27Juillet');
+    ws.getCell(1, 1).value = 'S1';
+    ['LUNDI'].forEach((name, i) => (ws.getCell(1, 2 + i * 4).value = name));
+    ws.getCell(3, 1).value = 'TAUZIN Caroline';
+    ws.getCell(4, 1).value = 'ES -1 ETP';
+    ws.getCell(3, 2).value = 'rh';
+    const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
+    const parsed = await parsePlanning(buffer, 'plan.xlsx');
+    const monday = parsed.planning.people[0].weeks[0][0];
+    expect(monday).toEqual({ type: 'off', label: 'rh' });
+    expect(parsed.warnings).toEqual([]);
+  });
+
+  it('parses lenient time separators like 18;30 into a slot', async () => {
+    const workbook = new ExcelJS.Workbook();
+    const ws = workbook.addWorksheet('A compter du 27Juillet');
+    ws.getCell(1, 1).value = 'S1';
+    ['LUNDI'].forEach((name, i) => (ws.getCell(1, 2 + i * 4).value = name));
+    ws.getCell(3, 1).value = 'TAUZIN Caroline';
+    ws.getCell(4, 1).value = 'ES -1 ETP';
+    ws.getCell(3, 2).value = '14;00';
+    ws.getCell(3, 3).value = '18;30';
+    const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
+    const parsed = await parsePlanning(buffer, 'plan.xlsx');
+    const monday = parsed.planning.people[0].weeks[0][0];
+    expect(monday).toEqual({
+      type: 'shift',
+      slots: [{ start: '14:00', end: '18:30' }],
+    });
+    expect(parsed.warnings).toEqual([]);
+  });
 });

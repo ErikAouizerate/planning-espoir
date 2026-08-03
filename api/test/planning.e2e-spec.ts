@@ -79,6 +79,22 @@ describe('Planning (e2e)', () => {
     await request(app.getHttpServer()).get('/api/planning/schedule?month=nope').expect(400);
   });
 
+  it('exposes day-off cells through the schedule', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/api/planning/schedule?month=2026-07')
+      .expect(200);
+    const tuesday = res.body.days['2026-07-28']; // S1 Tuesday
+    expect(tuesday).toHaveLength(2);
+    expect(tuesday[0]).toMatchObject({ name: 'TAUZIN Caroline' });
+    expect(tuesday[0].cell).toEqual({ type: 'off', label: 'rh' });
+  });
+
+  it('rejects out-of-range months on the schedule endpoint', async () => {
+    await request(app.getHttpServer()).get('/api/planning/schedule?month=2026-99').expect(400);
+    await request(app.getHttpServer()).get('/api/planning/schedule?month=2026-13').expect(400);
+    await request(app.getHttpServer()).get('/api/planning/schedule?month=2026-00').expect(400);
+  });
+
   it('round-trips config via GET/PUT', async () => {
     const before = await request(app.getHttpServer()).get('/api/planning/config').expect(200);
     expect(before.body).toEqual({ startDate: '2026-07-27', defaultName: null });
@@ -95,6 +111,17 @@ describe('Planning (e2e)', () => {
     await request(app.getHttpServer())
       .put('/api/planning/config')
       .send({ startDate: 'not-a-date' })
+      .expect(400);
+  });
+
+  it('rejects an impossible startDate on PUT', async () => {
+    await request(app.getHttpServer())
+      .put('/api/planning/config')
+      .send({ startDate: '2026-99-99' })
+      .expect(400);
+    await request(app.getHttpServer())
+      .put('/api/planning/config')
+      .send({ startDate: '2026-02-30' })
       .expect(400);
   });
 });

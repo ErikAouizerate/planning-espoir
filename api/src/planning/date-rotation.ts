@@ -1,6 +1,21 @@
 const DAY_MS = 86_400_000;
 const WEEK_COUNT = 6;
 
+export function isValidMonth(month: string): boolean {
+  return /^\d{4}-(0[1-9]|1[0-2])$/.test(month);
+}
+
+export function isValidDateKey(dateKey: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return false;
+  const [year, month, day] = dateKey.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+}
+
 export function weekIndexForDate(startDate: string, date: string): number {
   const startMs = Date.parse(`${startDate}T00:00:00Z`);
   const dateMs = Date.parse(`${date}T00:00:00Z`);

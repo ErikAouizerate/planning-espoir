@@ -6,7 +6,7 @@ import type {
   ParsingWarning,
   ScheduleMonth,
 } from '@planning-espoir/shared';
-import { monthDays, weekIndexForDate, weekdayIndex } from './date-rotation';
+import { monthDays, isValidMonth, isValidDateKey, weekIndexForDate, weekdayIndex } from './date-rotation';
 import { parsePlanning, PlanningFormatError } from './parser';
 import { Storage } from './storage';
 
@@ -56,7 +56,7 @@ export class PlanningService {
   }
 
   async getSchedule(month: string): Promise<ScheduleMonth> {
-    if (!/^\d{4}-\d{2}$/.test(month)) throw new BadRequestException('month must be YYYY-MM');
+    if (!isValidMonth(month)) throw new BadRequestException('month must be YYYY-MM');
     const stored = await this.storage.loadPlanningJson();
     if (!stored) throw new NotFoundException('No planning uploaded yet');
     const config = await this.storage.loadConfig();
@@ -82,7 +82,7 @@ export class PlanningService {
   async updateConfig(update: Partial<Config>): Promise<Config> {
     const config = await this.storage.loadConfig();
     if (update.startDate !== undefined) {
-      if (update.startDate !== null && !/^\d{4}-\d{2}-\d{2}$/.test(update.startDate)) {
+      if (update.startDate !== null && !isValidDateKey(update.startDate)) {
         throw new BadRequestException('startDate must be YYYY-MM-DD');
       }
       config.startDate = update.startDate;

@@ -20,6 +20,7 @@ export async function buildPlanningBuffer(): Promise<Buffer> {
   ws.getCell(6, 3).value = time(13, 0);
   ws.getCell(6, 4).value = time(13, 30);
   ws.getCell(6, 5).value = time(17, 30);
+  ws.getCell(6, 6).value = 'rh';
   ws.getCell(7, 1).value = roles[0];
   ws.getCell(8, 1).value = people[1];
   ws.getCell(9, 1).value = roles[1];
