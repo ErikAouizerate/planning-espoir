@@ -32,4 +32,9 @@ describe('store', () => {
     store.dispatch(scheduleFetchRequested('2026-08'));
     expect(store.getState().schedule.status).toBe('loading');
   });
+
+  it('starts with an empty auth state', () => {
+    const store = configureStore();
+    expect(store.getState().auth).toEqual({ status: 'idle', username: null, error: null });
+  });
 });

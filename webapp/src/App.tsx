@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { Legend } from './components/Legend';
 import { MonthCalendar } from './components/MonthCalendar';
 import {
+  authFetchRequested,
   configFetchRequested,
   planningFetchRequested,
   scheduleFetchRequested,
@@ -20,6 +21,7 @@ export default function App() {
   useEffect(() => {
     dispatch(planningFetchRequested());
     dispatch(scheduleFetchRequested(currentMonthKey()));
+    dispatch(authFetchRequested());
   }, [dispatch]);
 
   useEffect(() => {

@@ -1,4 +1,5 @@
 import type { Config, Person, ParsingWarning, ScheduleMonth } from '@planning-espoir/shared';
+import { keycloak } from '../auth/keycloak';
 
 export interface PlanningResponse {
   startDate: string | null;
@@ -6,8 +7,15 @@ export interface PlanningResponse {
   warnings: ParsingWarning[];
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, init);
+export function getAuthToken(): string | null {
+  return keycloak.getToken();
+}
+
+async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const token = getAuthToken();
+  const headers = new Headers(init.headers);
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+  const res = await fetch(path, { ...init, headers });
   if (!res.ok) {
     let message = `Request failed (${res.status})`;
     try {
@@ -19,6 +27,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new Error(message);
   }
   return res.json() as Promise<T>;
+}
+
+export function fetchAuthMe(): Promise<{ username: string }> {
+  return request<{ username: string }>('/api/auth/me');
 }
 
 export function fetchPlanning(): Promise<PlanningResponse> {

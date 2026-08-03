@@ -2,11 +2,15 @@ import type { Middleware } from 'redux';
 import * as api from '../api/client';
 import type { Config } from '@planning-espoir/shared';
 import {
+  AUTH_FETCH_REQUESTED,
   CONFIG_FETCH_REQUESTED,
   CONFIG_UPDATE_REQUESTED,
   PLANNING_FETCH_REQUESTED,
   PLANNING_UPLOAD_REQUESTED,
   SCHEDULE_FETCH_REQUESTED,
+  authFetchError,
+  authFetchStart,
+  authFetchSuccess,
   configFetchError,
   configFetchRequested,
   configFetchStart,
@@ -32,6 +36,14 @@ export const apiMiddleware: Middleware<object, RootState> = (store) => (next) =>
   const typed = action as { type: string; payload?: unknown };
 
   switch (typed.type) {
+    case AUTH_FETCH_REQUESTED:
+      store.dispatch(authFetchStart());
+      api
+        .fetchAuthMe()
+        .then((data) => store.dispatch(authFetchSuccess(data.username)))
+        .catch((err: Error) => store.dispatch(authFetchError(err.message)));
+      break;
+
     case PLANNING_FETCH_REQUESTED:
       store.dispatch(planningFetchStart());
       api

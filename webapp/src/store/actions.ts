@@ -28,6 +28,11 @@ export const CONFIG_UPDATE_ERROR = 'CONFIG_UPDATE_ERROR';
 export const SELECTION_TOGGLE = 'SELECTION_TOGGLE';
 export const SELECTION_CLEAR = 'SELECTION_CLEAR';
 
+export const AUTH_FETCH_REQUESTED = 'AUTH_FETCH_REQUESTED';
+export const AUTH_FETCH_START = 'AUTH_FETCH_START';
+export const AUTH_FETCH_SUCCESS = 'AUTH_FETCH_SUCCESS';
+export const AUTH_FETCH_ERROR = 'AUTH_FETCH_ERROR';
+
 export interface Action<T = string, P = unknown> {
   type: T;
   payload?: P;
@@ -144,4 +149,20 @@ export function selectionToggle(name: string): Action<typeof SELECTION_TOGGLE, s
 
 export function selectionClear(): Action<typeof SELECTION_CLEAR> {
   return { type: SELECTION_CLEAR };
+}
+
+export function authFetchRequested(): Action<typeof AUTH_FETCH_REQUESTED> {
+  return { type: AUTH_FETCH_REQUESTED };
+}
+
+export function authFetchStart(): Action<typeof AUTH_FETCH_START> {
+  return { type: AUTH_FETCH_START };
+}
+
+export function authFetchSuccess(username: string): Action<typeof AUTH_FETCH_SUCCESS, string> {
+  return { type: AUTH_FETCH_SUCCESS, payload: username };
+}
+
+export function authFetchError(error: string): Action<typeof AUTH_FETCH_ERROR> {
+  return { type: AUTH_FETCH_ERROR, error };
 }

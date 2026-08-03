@@ -22,6 +22,7 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
       error: null,
     },
     colors: { palette: ['#ff0000'] },
+    auth: { status: 'loaded', username: null, error: null },
     ...overrides,
   };
 }

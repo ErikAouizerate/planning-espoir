@@ -2,6 +2,9 @@ import { combineReducers } from 'redux';
 import type { PersonDay, ParsingWarning } from '@planning-espoir/shared';
 import type { Action } from './actions';
 import {
+  AUTH_FETCH_ERROR,
+  AUTH_FETCH_START,
+  AUTH_FETCH_SUCCESS,
   CONFIG_FETCH_ERROR,
   CONFIG_FETCH_START,
   CONFIG_FETCH_SUCCESS,
@@ -22,6 +25,7 @@ import {
 } from './actions';
 import { PALETTE } from '../colors';
 import type {
+  AuthState,
   ColorsState,
   ConfigState,
   PlanningState,
@@ -165,10 +169,30 @@ function colorsReducer(state: ColorsState = initialColors): ColorsState {
   return state;
 }
 
+const initialAuth: AuthState = {
+  status: 'idle',
+  username: null,
+  error: null,
+};
+
+function authReducer(state: AuthState = initialAuth, action: Action): AuthState {
+  switch (action.type) {
+    case AUTH_FETCH_START:
+      return { ...state, status: 'loading', error: null };
+    case AUTH_FETCH_SUCCESS:
+      return { ...state, status: 'loaded', username: action.payload as string, error: null };
+    case AUTH_FETCH_ERROR:
+      return { ...state, status: 'error', error: action.error ?? 'Auth fetch failed' };
+    default:
+      return state;
+  }
+}
+
 export const rootReducer = combineReducers({
   planning: planningReducer,
   schedule: scheduleReducer,
   config: configReducer,
   selection: selectionReducer,
   colors: colorsReducer,
+  auth: authReducer,
 });

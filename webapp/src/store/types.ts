@@ -30,12 +30,19 @@ export interface ColorsState {
   palette: string[];
 }
 
+export interface AuthState {
+  status: Status;
+  username: string | null;
+  error: string | null;
+}
+
 export interface RootState {
   planning: PlanningState;
   schedule: ScheduleState;
   selection: SelectionState;
   config: ConfigState;
   colors: ColorsState;
+  auth: AuthState;
 }
 
 export type { DayCell, Person, PersonDay };

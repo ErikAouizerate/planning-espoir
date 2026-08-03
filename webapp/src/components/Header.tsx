@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { keycloak } from '../auth/keycloak';
 import { scheduleFetchRequested } from '../store/actions';
 import type { RootState } from '../store/types';
 import { monthLabel, shiftMonth } from '../utils/dates';
@@ -11,6 +12,8 @@ export function Header() {
   const dispatch = useDispatch();
   const month = useSelector((state: RootState) => state.schedule.month);
   const fileName = useSelector((state: RootState) => state.config.config.fileName);
+  const username = useSelector((state: RootState) => state.auth.username);
+  const authEnabled = keycloak.isEnabled();
   const [configOpen, setConfigOpen] = useState(false);
 
   return (
@@ -48,6 +51,15 @@ export function Header() {
         className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
       >
         Config
+      </button>
+      {username && <span className="text-sm text-slate-700">{username}</span>}
+      <button
+        type="button"
+        onClick={() => keycloak.signout()}
+        disabled={!authEnabled}
+        className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        Signout
       </button>
       <ConfigModal open={configOpen} onClose={() => setConfigOpen(false)} />
     </header>
