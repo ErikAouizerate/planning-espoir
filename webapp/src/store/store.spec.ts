@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { planningFetchError, scheduleFetchRequested, selectionToggle } from './actions';
+import {
+  planningFetchError,
+  scheduleFetchRequested,
+  selectionAdd,
+  selectionToggle,
+} from './actions';
 import { configureStore } from './store';
 
 describe('store', () => {
@@ -18,6 +23,14 @@ describe('store', () => {
     store.dispatch(selectionToggle('B'));
     store.dispatch(selectionToggle('A'));
     expect(store.getState().selection.names).toEqual(['B']);
+  });
+
+  it('adds a person without removing it on repeated adds', () => {
+    const store = configureStore();
+    store.dispatch(selectionAdd('A'));
+    store.dispatch(selectionAdd('A'));
+    store.dispatch(selectionAdd('B'));
+    expect(store.getState().selection.names).toEqual(['A', 'B']);
   });
 
   it('records a fetch error on the planning slice', () => {

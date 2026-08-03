@@ -17,50 +17,54 @@ export function Header() {
   const [configOpen, setConfigOpen] = useState(false);
 
   return (
-    <header className="flex flex-wrap items-center gap-3 border-b border-slate-200 bg-white px-4 py-3">
-      <div>
-        <h1 className="font-display text-xl font-bold text-slate-800">Planning Espoir</h1>
-        {fileName && <p className="text-xs text-slate-400">{fileName}</p>}
+    <header className="border-b border-slate-200 bg-white px-4 py-3">
+      <div className="grid grid-cols-3 items-center gap-3">
+        <div>
+          <h1 className="font-display text-xl font-bold text-slate-800">Planning Espoir</h1>
+          {fileName && <p className="text-xs text-slate-400">{fileName}</p>}
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <button
+            type="button"
+            onClick={() => dispatch(scheduleFetchRequested(shiftMonth(month, -1)))}
+            className="rounded border border-slate-300 px-2 py-1 text-sm"
+            aria-label="Mois précédent"
+          >
+            ‹
+          </button>
+          <span className="min-w-28 text-center text-sm font-medium text-slate-700">
+            {monthLabel(month)}
+          </span>
+          <button
+            type="button"
+            onClick={() => dispatch(scheduleFetchRequested(shiftMonth(month, 1)))}
+            className="rounded border border-slate-300 px-2 py-1 text-sm"
+            aria-label="Mois suivant"
+          >
+            ›
+          </button>
+          <PersonDropdown />
+          <UploadButton />
+          <button
+            type="button"
+            onClick={() => setConfigOpen(true)}
+            className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+          >
+            Config
+          </button>
+        </div>
+        <div className="flex items-center justify-end gap-2">
+          {username && <span className="text-sm text-slate-700">{username}</span>}
+          <button
+            type="button"
+            onClick={() => keycloak.signout()}
+            disabled={!authEnabled}
+            className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Signout
+          </button>
+        </div>
       </div>
-      <div className="ml-auto flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => dispatch(scheduleFetchRequested(shiftMonth(month, -1)))}
-          className="rounded border border-slate-300 px-2 py-1 text-sm"
-          aria-label="Mois précédent"
-        >
-          ‹
-        </button>
-        <span className="min-w-28 text-center text-sm font-medium text-slate-700">
-          {monthLabel(month)}
-        </span>
-        <button
-          type="button"
-          onClick={() => dispatch(scheduleFetchRequested(shiftMonth(month, 1)))}
-          className="rounded border border-slate-300 px-2 py-1 text-sm"
-          aria-label="Mois suivant"
-        >
-          ›
-        </button>
-      </div>
-      <PersonDropdown />
-      <UploadButton />
-      <button
-        type="button"
-        onClick={() => setConfigOpen(true)}
-        className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
-      >
-        Config
-      </button>
-      {username && <span className="text-sm text-slate-700">{username}</span>}
-      <button
-        type="button"
-        onClick={() => keycloak.signout()}
-        disabled={!authEnabled}
-        className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        Signout
-      </button>
       <ConfigModal open={configOpen} onClose={() => setConfigOpen(false)} />
     </header>
   );

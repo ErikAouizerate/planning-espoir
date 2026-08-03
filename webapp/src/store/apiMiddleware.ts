@@ -28,7 +28,7 @@ import {
   scheduleFetchRequested,
   scheduleFetchStart,
   scheduleFetchSuccess,
-  selectionToggle,
+  selectionAdd,
 } from './actions';
 import type { RootState } from './types';
 
@@ -82,7 +82,7 @@ export const apiMiddleware: Middleware<object, RootState> = (store) => (next) =>
           const name = data.defaultName;
           const people = store.getState().planning.people ?? [];
           if (name && people.some((p) => p.name === name)) {
-            store.dispatch(selectionToggle(name));
+            store.dispatch(selectionAdd(name));
           }
         })
         .catch((err: Error) => store.dispatch(configFetchError(err.message)));

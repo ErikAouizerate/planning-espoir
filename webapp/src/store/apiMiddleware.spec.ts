@@ -53,6 +53,34 @@ describe('apiMiddleware', () => {
     });
   });
 
+  it('keeps the default user selected when a second config fetch resolves', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const configBody = () =>
+      new Response(
+        JSON.stringify({ startDate: '2026-07-27', defaultName: 'TAUZIN Caroline', fileName: null }),
+        { status: 200 },
+      );
+    fetchMock.mockResolvedValueOnce(configBody()).mockResolvedValueOnce(configBody());
+
+    const store = configureStore();
+    store.dispatch({
+      type: 'PLANNING_FETCH_SUCCESS',
+      payload: {
+        startDate: '2026-07-27',
+        people: [{ name: 'TAUZIN Caroline', role: 'R', colorIndex: 0, weeks: [] }],
+        warnings: [],
+      },
+    });
+
+    // Simulates StrictMode double-invocation of the config fetch effect
+    store.dispatch(configFetchRequested());
+    store.dispatch(configFetchRequested());
+
+    await vi.waitFor(() => {
+      expect(store.getState().selection.names).toEqual(['TAUZIN Caroline']);
+    });
+  });
+
   it('refetches config after a successful planning upload', async () => {
     const fetchMock = vi.mocked(fetch);
 

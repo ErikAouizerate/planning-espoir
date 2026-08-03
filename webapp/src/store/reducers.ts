@@ -21,6 +21,7 @@ import {
   SCHEDULE_FETCH_START,
   SCHEDULE_FETCH_SUCCESS,
   SELECTION_CLEAR,
+  SELECTION_ADD,
   SELECTION_TOGGLE,
 } from './actions';
 import { PALETTE } from '../colors';
@@ -157,6 +158,11 @@ function selectionReducer(
         ? state.names.filter((n) => n !== name)
         : [...state.names, name];
       return { names };
+    }
+    case SELECTION_ADD: {
+      const name = action.payload as string;
+      if (state.names.includes(name)) return state;
+      return { names: [...state.names, name] };
     }
     case SELECTION_CLEAR:
       return { names: [] };

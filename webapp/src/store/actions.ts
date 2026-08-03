@@ -26,6 +26,7 @@ export const CONFIG_UPDATE_SUCCESS = 'CONFIG_UPDATE_SUCCESS';
 export const CONFIG_UPDATE_ERROR = 'CONFIG_UPDATE_ERROR';
 
 export const SELECTION_TOGGLE = 'SELECTION_TOGGLE';
+export const SELECTION_ADD = 'SELECTION_ADD';
 export const SELECTION_CLEAR = 'SELECTION_CLEAR';
 
 export const AUTH_FETCH_REQUESTED = 'AUTH_FETCH_REQUESTED';
@@ -145,6 +146,10 @@ export function configUpdateError(error: string): Action<typeof CONFIG_UPDATE_ER
 
 export function selectionToggle(name: string): Action<typeof SELECTION_TOGGLE, string> {
   return { type: SELECTION_TOGGLE, payload: name };
+}
+
+export function selectionAdd(name: string): Action<typeof SELECTION_ADD, string> {
+  return { type: SELECTION_ADD, payload: name };
 }
 
 export function selectionClear(): Action<typeof SELECTION_CLEAR> {
