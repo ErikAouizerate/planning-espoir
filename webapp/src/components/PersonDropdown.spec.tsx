@@ -1,9 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
 import { describe, expect, it } from 'vitest';
-import { rootReducer } from '../store/reducers';
+import { createTestStore } from '../test/store';
 import type { RootState } from '../store/types';
 import { PersonDropdown } from './PersonDropdown';
 
@@ -31,7 +30,7 @@ describe('PersonDropdown', () => {
   it('closes when clicking outside the dropdown', async () => {
     const user = userEvent.setup();
     render(
-      <Provider store={createStore(rootReducer, makeState())}>
+      <Provider store={createTestStore(makeState())}>
         <div>
           <PersonDropdown />
           <button data-testid="outside">outside</button>

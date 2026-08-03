@@ -1,8 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
 import { describe, expect, it } from 'vitest';
-import { rootReducer } from '../store/reducers';
+import { createTestStore } from '../test/store';
 import type { RootState } from '../store/types';
 import { Header } from './Header';
 
@@ -34,7 +33,7 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
 describe('Header', () => {
   it('shows the displayed month as a French label', () => {
     render(
-      <Provider store={createStore(rootReducer, makeState())}>
+      <Provider store={createTestStore(makeState())}>
         <Header />
       </Provider>,
     );
@@ -43,7 +42,7 @@ describe('Header', () => {
 
   it('shows the uploaded file name', () => {
     render(
-      <Provider store={createStore(rootReducer, makeState())}>
+      <Provider store={createTestStore(makeState())}>
         <Header />
       </Provider>,
     );

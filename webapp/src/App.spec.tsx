@@ -1,9 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
 import { describe, expect, it } from 'vitest';
 import App from './App';
-import { rootReducer } from './store/reducers';
+import { createTestStore } from './test/store';
 import type { RootState } from './store/types';
 
 function makeState(overrides: Partial<RootState> = {}): RootState {
@@ -34,8 +33,7 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
 describe('App', () => {
   it('renders a discreet warnings banner when the planning has warnings', () => {
     const warning = { week: 1, row: 6, column: 'B', value: '9?30' };
-    const store = createStore(
-      rootReducer,
+    const store = createTestStore(
       makeState({
         planning: { status: 'loaded', people: [], warnings: [warning], error: null },
       }),
@@ -52,8 +50,7 @@ describe('App', () => {
   });
 
   it('renders the schedule error banner when the schedule fetch failed', () => {
-    const store = createStore(
-      rootReducer,
+    const store = createTestStore(
       makeState({
         schedule: { status: 'error', month: '', days: null, error: 'Schedule fetch failed' },
       }),
@@ -67,8 +64,7 @@ describe('App', () => {
   });
 
   it('renders the config error banner when the config fetch failed', () => {
-    const store = createStore(
-      rootReducer,
+    const store = createTestStore(
       makeState({
         config: {
           status: 'error',

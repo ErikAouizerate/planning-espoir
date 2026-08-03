@@ -1,9 +1,8 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
 import { describe, expect, it } from 'vitest';
-import { rootReducer } from '../store/reducers';
+import { createTestStore } from '../test/store';
 import type { RootState } from '../store/types';
 import { ConfigModal } from './ConfigModal';
 
@@ -37,7 +36,7 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
 
 describe('ConfigModal', () => {
   it('shows the current start date as the selected Monday', () => {
-    const store = createStore(rootReducer, makeState());
+    const store = createTestStore(makeState());
     render(
       <Provider store={store}>
         <ConfigModal open onClose={() => {}} />
@@ -51,7 +50,7 @@ describe('ConfigModal', () => {
 
   it('proposes the people list in the default name dropdown', async () => {
     const user = userEvent.setup();
-    const store = createStore(rootReducer, makeState());
+    const store = createTestStore(makeState());
     render(
       <Provider store={store}>
         <ConfigModal open onClose={() => {}} />
@@ -68,7 +67,7 @@ describe('ConfigModal', () => {
 
   it('navigates months and lists the Mondays of the displayed month', async () => {
     const user = userEvent.setup();
-    const store = createStore(rootReducer, makeState());
+    const store = createTestStore(makeState());
     render(
       <Provider store={store}>
         <ConfigModal open onClose={() => {}} />
@@ -86,7 +85,7 @@ describe('ConfigModal', () => {
 
   it('updates the label when a Monday is selected', async () => {
     const user = userEvent.setup();
-    const store = createStore(rootReducer, makeState());
+    const store = createTestStore(makeState());
     render(
       <Provider store={store}>
         <ConfigModal open onClose={() => {}} />

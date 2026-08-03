@@ -15,6 +15,7 @@
     "@fontsource/merriweather-sans": "5.3.0",
     "@fontsource/nunito": "5.3.0",
     "@planning-espoir/shared": "*",
+    "@reduxjs/toolkit": "2.12.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-redux": "^9.3.0",
