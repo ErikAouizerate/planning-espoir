@@ -5,6 +5,7 @@ import {
   monthGrid,
   monthLabel,
   shiftMonth,
+  todayKey,
   weekdayLabel,
 } from './dates';
 
@@ -59,5 +60,13 @@ describe('dates utils', () => {
 
   it('formats a date key as a full French date', () => {
     expect(formatFullDate('2026-07-27')).toBe('lundi 27 juillet 2026');
+  });
+
+  it('produces the current date as a UTC date key', () => {
+    const now = new Date();
+    const expected = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}-${String(
+      now.getUTCDate(),
+    ).padStart(2, '0')}`;
+    expect(todayKey()).toBe(expected);
   });
 });

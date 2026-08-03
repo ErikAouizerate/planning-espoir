@@ -5,6 +5,13 @@ export function currentMonthKey(): string {
   return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
 }
 
+export function todayKey(): string {
+  const now = new Date();
+  return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}-${String(
+    now.getUTCDate(),
+  ).padStart(2, '0')}`;
+}
+
 export function shiftMonth(month: string, delta: number): string {
   const [year, monthIndex] = month.split('-').map(Number);
   const d = new Date(Date.UTC(year, monthIndex - 1 + delta, 1));

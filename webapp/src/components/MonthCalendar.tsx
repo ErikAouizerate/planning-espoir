@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { monthGrid, monthLabel, weekdayLabel } from '../utils/dates';
+import { monthGrid, monthLabel, todayKey, weekdayLabel } from '../utils/dates';
 import type { RootState } from '../store/types';
 import { DayCell } from './DayCell';
 
@@ -8,6 +8,7 @@ export function MonthCalendar() {
   const days = useSelector((state: RootState) => state.schedule.days);
   const selection = useSelector((state: RootState) => state.selection.names);
   const palette = useSelector((state: RootState) => state.colors.palette);
+  const today = todayKey();
 
   if (!days) return null;
   const grid = monthGrid(month);
@@ -32,12 +33,13 @@ export function MonthCalendar() {
               ? (days[date] ?? []).filter((pd) => selection.includes(pd.name))
               : [];
             const isLastCol = idx % 7 === 6;
+            const isToday = date === today;
             return (
               <div
                 key={idx}
                 className={`min-h-16 border-b p-0.5 sm:min-h-24 sm:p-1 ${
-                  isLastCol ? 'border-slate-200' : 'border-r border-b border-slate-200'
-                }`}
+                  isToday ? 'bg-blue-50' : ''
+                } ${isLastCol ? 'border-slate-200' : 'border-r border-b border-slate-200'}`}
                 data-testid={date ? `day-${date}` : undefined}
               >
                 {date && (

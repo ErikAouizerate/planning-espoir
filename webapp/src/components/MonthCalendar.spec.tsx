@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
 import { describe, expect, it } from 'vitest';
-import { rootReducer } from '../store/reducers';
+import { createTestStore } from '../test/store';
+import { todayKey } from '../utils/dates';
 import type { RootState } from '../store/types';
 import { MonthCalendar } from './MonthCalendar';
 
@@ -46,7 +46,7 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
 describe('MonthCalendar', () => {
   it('renders weekday headers', () => {
     render(
-      <Provider store={createStore(rootReducer, makeState())}>
+      <Provider store={createTestStore(makeState())}>
         <MonthCalendar />
       </Provider>,
     );
@@ -55,7 +55,7 @@ describe('MonthCalendar', () => {
   });
 
   it('renders selected people day cells with shift times and off badge', () => {
-    const store = createStore(rootReducer, makeState());
+    const store = createTestStore(makeState());
     render(
       <Provider store={store}>
         <MonthCalendar />
@@ -67,10 +67,29 @@ describe('MonthCalendar', () => {
 
   it('shows the displayed month and year above the grid', () => {
     render(
-      <Provider store={createStore(rootReducer, makeState())}>
+      <Provider store={createTestStore(makeState())}>
         <MonthCalendar />
       </Provider>,
     );
     expect(screen.getByRole('heading', { name: 'août 2026' })).toBeInTheDocument();
+  });
+
+  it('highlights the current day cell with a distinct background', () => {
+    const today = todayKey();
+    const [year, month] = today.split('-');
+    render(
+      <Provider
+        store={createTestStore(
+          makeState({
+            schedule: { status: 'loaded', month: `${year}-${month}`, days: {}, error: null },
+          }),
+        )}
+      >
+        <MonthCalendar />
+      </Provider>,
+    );
+    const cell = document.querySelector(`[data-testid="day-${today}"]`);
+    expect(cell).toBeInTheDocument();
+    expect(cell?.className).toContain('bg-blue-50');
   });
 });
