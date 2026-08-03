@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useClickOutside } from '../hooks/useClickOutside';
 import { configUpdateRequested } from '../store/actions';
 import type { RootState } from '../store/types';
 import { formatFullDate, mondaysInMonth, monthLabel, shiftMonth } from '../utils/dates';
@@ -18,6 +19,9 @@ export function ConfigModal({ open, onClose }: Props) {
   const [defaultName, setDefaultName] = useState('');
   const [month, setMonth] = useState('');
   const [nameOpen, setNameOpen] = useState(false);
+  const nameRef = useRef<HTMLDivElement>(null);
+
+  useClickOutside(nameRef, () => setNameOpen(false));
 
   useEffect(() => {
     if (open) {
@@ -41,7 +45,7 @@ export function ConfigModal({ open, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/40" onClick={onClose}>
       <div className="w-full max-w-md rounded-lg bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <h2 className="text-lg font-semibold text-slate-800">Configuration</h2>
+        <h2 className="font-display text-lg font-semibold text-slate-800">Configuration</h2>
 
         <div className="mt-4">
           <p className="text-sm font-medium text-slate-600">
@@ -93,7 +97,7 @@ export function ConfigModal({ open, onClose }: Props) {
 
         <label className="mt-4 block text-sm font-medium text-slate-600">
           Nom par défaut
-          <div className="relative mt-1">
+          <div className="relative mt-1" ref={nameRef}>
             <button
               type="button"
               onClick={() => setNameOpen((v) => !v)}

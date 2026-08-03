@@ -16,7 +16,7 @@ export function Header() {
   return (
     <header className="flex flex-wrap items-center gap-3 border-b border-slate-200 bg-white px-4 py-3">
       <div>
-        <h1 className="text-xl font-bold text-slate-800">Planning Espoir</h1>
+        <h1 className="font-display text-xl font-bold text-slate-800">Planning Espoir</h1>
         {fileName && <p className="text-xs text-slate-400">{fileName}</p>}
       </div>
       <div className="ml-auto flex items-center gap-2">

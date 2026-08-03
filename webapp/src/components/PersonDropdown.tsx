@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useClickOutside } from '../hooks/useClickOutside';
 import { selectionToggle } from '../store/actions';
 import type { RootState } from '../store/types';
 
@@ -8,9 +9,12 @@ export function PersonDropdown() {
   const people = useSelector((state: RootState) => state.planning.people) ?? [];
   const selection = useSelector((state: RootState) => state.selection.names);
   const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useClickOutside(containerRef, () => setOpen(false));
 
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

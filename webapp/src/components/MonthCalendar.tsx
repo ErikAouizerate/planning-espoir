@@ -14,31 +14,37 @@ export function MonthCalendar() {
 
   return (
     <div>
-      <h2 className="mb-2 text-center text-lg font-semibold text-slate-800">{monthLabel(month)}</h2>
+      <h2 className="font-display mb-2 text-center text-lg font-semibold text-slate-800">{monthLabel(month)}</h2>
       <div className="overflow-x-auto">
-        <div className="grid grid-cols-7 min-w-[700px]">
-        {Array.from({ length: 7 }, (_, i) => (
-          <div key={i} className="border-b border-slate-200 px-2 py-1 text-center text-xs font-semibold text-slate-500">
-            {weekdayLabel(i)}
-          </div>
-        ))}
-        {grid.flat().map((date, idx) => {
-          const personDays = date ? (days[date] ?? []).filter((pd) => selection.includes(pd.name)) : [];
-          return (
+        <div className="grid grid-cols-7">
+          {Array.from({ length: 7 }, (_, i) => (
             <div
-              key={idx}
-              className="min-h-24 border-b border-slate-100 p-1"
-              data-testid={date ? `day-${date}` : undefined}
+              key={i}
+              className="border-b border-r border-slate-200 bg-slate-50 px-1 py-1 text-center text-[10px] font-semibold text-slate-500 sm:px-2 sm:text-xs"
             >
-              {date && <div className="text-xs text-slate-400">{Number(date.slice(8, 10))}</div>}
-              <div className="mt-1 flex flex-col gap-0.5">
-                {personDays.map((pd) => (
-                  <DayCell key={pd.name} cell={pd.cell} colorIndex={pd.colorIndex} palette={palette} />
-                ))}
-              </div>
+              {weekdayLabel(i)}
             </div>
-          );
-        })}
+          ))}
+          {grid.flat().map((date, idx) => {
+            const personDays = date ? (days[date] ?? []).filter((pd) => selection.includes(pd.name)) : [];
+            const isLastCol = idx % 7 === 6;
+            return (
+              <div
+                key={idx}
+                className={`min-h-16 border-b p-0.5 sm:min-h-24 sm:p-1 ${
+                  isLastCol ? 'border-slate-200' : 'border-r border-b border-slate-200'
+                }`}
+                data-testid={date ? `day-${date}` : undefined}
+              >
+                {date && <div className="text-[10px] text-slate-400 sm:text-xs">{Number(date.slice(8, 10))}</div>}
+                <div className="mt-0.5 flex flex-col gap-0.5 sm:mt-1">
+                  {personDays.map((pd) => (
+                    <DayCell key={pd.name} cell={pd.cell} colorIndex={pd.colorIndex} palette={palette} />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
