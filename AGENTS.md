@@ -26,7 +26,7 @@ Confirm any architecture change with the user before committing to it.
 - Deployable with Docker + docker-compose.
 - No database: the date ↔ template-week correlation and the default user name are stored as flat files (shared by all users). The API stores the uploaded `.xlsx` plus a normalized JSON model under a `DATA_DIR` (default `./data`).
 - One page only; a dropdown lists all available names (multi-select allowed), default name comes from the flat file.
-- Auth: Keycloak via OIDC — design for it, do not implement yet (details TBD).
+- Auth: Keycloak via OIDC — implemented for development (realm `gateway`, disabled via `AUTH_ENABLED=false` in `api/.env` / `VITE_AUTH_ENABLED` in `webapp/.env`, mock user `test-user`). Production config TBD.
 
 ## Frontend constraints (non-negotiable)
 

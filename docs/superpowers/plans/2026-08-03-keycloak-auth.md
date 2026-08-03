@@ -27,6 +27,7 @@
 Add Keycloak config loading, the identity helper, the custom `AuthGuard`, the `AuthModule` with `GET /api/auth/me`, and register everything globally.
 
 **Files:**
+
 - Modify: `api/package.json` (add `jose`, `@nestjs/config`)
 - Create: `api/.env`
 - Modify: `api/tsconfig.json` (keep `"types": ["node", "jest"]`)
@@ -41,6 +42,7 @@ Add Keycloak config loading, the identity helper, the custom `AuthGuard`, the `A
 - Modify: `api/test/planning.e2e-spec.ts` (set `AUTH_ENABLED=false` in its `beforeAll` so existing tests keep passing)
 
 **Interfaces:**
+
 - Consumes: NestJS `ConfigService`, `ExecutionContext`, `CanActivate`, `UnauthorizedException`, `ServiceUnavailableException`.
 - Produces:
   - `interface AuthenticatedRequest extends Request { user?: { username: string } }` (in `auth.guard.ts`).
@@ -130,15 +132,21 @@ describe('AuthGuard', () => {
   });
 
   it('throws 401 when auth is enabled and no token is present', async () => {
-    const guard = new AuthGuard({ authEnabled: true, issuer: 'http://localhost:8080/realms/gateway' });
+    const guard = new AuthGuard({
+      authEnabled: true,
+      issuer: 'http://localhost:8080/realms/gateway',
+    });
     await expect(guard.canActivate(makeContext({}))).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
   it('throws 401 when auth is enabled and the token is not a Bearer token', async () => {
-    const guard = new AuthGuard({ authEnabled: true, issuer: 'http://localhost:8080/realms/gateway' });
-    await expect(guard.canActivate(makeContext({ authorization: 'Basic abc' }))).rejects.toBeInstanceOf(
-      UnauthorizedException,
-    );
+    const guard = new AuthGuard({
+      authEnabled: true,
+      issuer: 'http://localhost:8080/realms/gateway',
+    });
+    await expect(
+      guard.canActivate(makeContext({ authorization: 'Basic abc' })),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 });
 ```
@@ -176,7 +184,9 @@ export class AuthGuard implements CanActivate {
 
   constructor(private readonly options: AuthGuardOptions) {
     this.jwks = options.authEnabled
-      ? createRemoteJWKSet(new URL(`${options.issuer.replace(/\/$/, '')}/protocol/openid-connect/certs`))
+      ? createRemoteJWKSet(
+          new URL(`${options.issuer.replace(/\/$/, '')}/protocol/openid-connect/certs`),
+        )
       : null;
   }
 
@@ -203,7 +213,12 @@ export class AuthGuard implements CanActivate {
       return true;
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
-      if (error && typeof error === 'object' && 'code' in error && error.code === 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED') {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'code' in error &&
+        error.code === 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED'
+      ) {
         throw new UnauthorizedException('Invalid token');
       }
       throw new ServiceUnavailableException('Unable to verify token against the identity provider');
@@ -234,7 +249,8 @@ import { AuthGuard } from './auth.guard';
       provide: AuthGuard,
       useFactory: (config: ConfigService): AuthGuard => {
         const authEnabled = (config.get<string>('AUTH_ENABLED') ?? 'true') !== 'false';
-        const issuer = config.get<string>('KEYCLOAK_ISSUER') ?? 'http://localhost:8080/realms/gateway';
+        const issuer =
+          config.get<string>('KEYCLOAK_ISSUER') ?? 'http://localhost:8080/realms/gateway';
         return new AuthGuard({ authEnabled, issuer });
       },
       inject: [ConfigService],
@@ -327,11 +343,15 @@ import { join } from 'path';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 
-async function buildApp(authEnabled: string): Promise<{ app: INestApplication; cleanup: () => Promise<void> }> {
+async function buildApp(
+  authEnabled: string,
+): Promise<{ app: INestApplication; cleanup: () => Promise<void> }> {
   const dataDir = await mkdtemp(join(tmpdir(), 'auth-e2e-'));
   process.env.DATA_DIR = dataDir;
   process.env.AUTH_ENABLED = authEnabled;
-  const moduleFixture: TestingModule = await Test.createTestingModule({ imports: [AppModule] }).compile();
+  const moduleFixture: TestingModule = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
   const app = moduleFixture.createNestApplication();
   app.setGlobalPrefix('api');
   await app.init();
@@ -412,6 +432,7 @@ git commit -m "feat: add Keycloak auth guard and /auth/me endpoint"
 Add the webapp auth layer: env config, `keycloak-js` wrapper with mock mode, the `auth` reducer + actions + middleware handling, Bearer token attachment in the API client, and the header username + Signout button.
 
 **Files:**
+
 - Modify: `webapp/package.json` (add `keycloak-js`)
 - Create: `webapp/.env`
 - Create: `webapp/src/auth/config.ts`
@@ -430,6 +451,7 @@ Add the webapp auth layer: env config, `keycloak-js` wrapper with mock mode, the
 - Create: `webapp/src/components/Header.spec.tsx` (username + disabled signout in mock)
 
 **Interfaces:**
+
 - Consumes: `@planning-espoir/shared` types, existing store pattern.
 - Produces:
   - `authConfig: { enabled: boolean; url: string; realm: string; clientId: string }` (from `webapp/src/auth/config.ts`, read from `import.meta.env`).
@@ -781,7 +803,9 @@ vi.mock('../auth/keycloak', () => ({
 // in a test:
 it('attaches the Bearer token when present', async () => {
   tokenMock.mockReturnValue('token-123');
-  vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify({ username: 'test-user' }), { status: 200 }));
+  vi.mocked(fetch).mockResolvedValue(
+    new Response(JSON.stringify({ username: 'test-user' }), { status: 200 }),
+  );
   await fetchAuthMe();
   const [url, init] = vi.mocked(fetch).mock.calls[0];
   expect(String(url)).toBe('/api/auth/me');
@@ -813,9 +837,9 @@ const username = useSelector((state: RootState) => state.auth.username);
 const authEnabled = keycloak.isEnabled();
 
 // in the header, after the Config button:
-{username && (
-  <span className="text-sm text-slate-700">{username}</span>
-)}
+{
+  username && <span className="text-sm text-slate-700">{username}</span>;
+}
 <button
   type="button"
   onClick={() => keycloak.signout()}
@@ -823,7 +847,7 @@ const authEnabled = keycloak.isEnabled();
   className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
 >
   Signout
-</button>
+</button>;
 ```
 
 - [ ] **Step 14: Write the failing Header spec**
@@ -849,7 +873,11 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
     planning: { status: 'loaded', people: [], warnings: [], error: null },
     schedule: { status: 'loaded', month: '2026-08', days: {}, error: null },
     selection: { names: [] },
-    config: { status: 'loaded', config: { startDate: null, defaultName: null, fileName: null }, error: null },
+    config: {
+      status: 'loaded',
+      config: { startDate: null, defaultName: null, fileName: null },
+      error: null,
+    },
     colors: { palette: ['#ff0000'] },
     auth: { status: 'loaded', username: 'admin@example.com', error: null },
     ...overrides,
@@ -902,11 +930,13 @@ git commit -m "feat: add Keycloak auth to the webapp"
 Final verification, gitignore hygiene, and documentation updates.
 
 **Files:**
+
 - Modify: `.gitignore` (ignore `.env`)
 - Modify: `AGENTS.md` (auth is now implemented for dev)
 - Modify: `IMPROVEMENTS.md` (remove the handled remark)
 
 **Interfaces:**
+
 - Consumes: all prior tasks.
 
 - [ ] **Step 1: Add `.env` to `.gitignore`**

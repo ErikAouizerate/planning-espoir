@@ -108,6 +108,7 @@ api (3000)
 ## Configuration
 
 `webapp/.env`:
+
 ```
 VITE_AUTH_ENABLED=true
 VITE_KEYCLOAK_URL=http://localhost:8080
@@ -116,6 +117,7 @@ VITE_KEYCLOAK_CLIENT_ID=gateway
 ```
 
 `api/.env`:
+
 ```
 AUTH_ENABLED=true
 KEYCLOAK_ISSUER=http://localhost:8080/realms/gateway
