@@ -1,4 +1,6 @@
 import tseslint from 'typescript-eslint';
+import prettier from 'eslint-config-prettier';
+import prettierPlugin from 'eslint-plugin-prettier';
 
 export default tseslint.config(
   {
@@ -12,6 +14,11 @@ export default tseslint.config(
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
+    },
+    plugins: { prettier: prettierPlugin },
+    rules: {
+      ...prettier.rules,
+      'prettier/prettier': 'error',
     },
   },
 );
