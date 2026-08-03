@@ -70,9 +70,11 @@ At open, no person is selected. The `defaultName` in the flat config file is an 
 
 ### D10: Person identity and name normalization
 
-Person identity is the **trimmed** display name. Whitespace is stripped before comparison, so `Anais Bouyssounaîs ` and `Anais Bouyssounaîs` are the same person. The person list is built from week `S1`; each later week's row is assigned to the person whose trimmed name matches. A trimmed name that matches no existing person creates a new person.
+People always appear in the same order in every week block. The canonical person list (names, roles, colors) is built **from the `S1` block only**; later weeks are matched to those people **by row index** within the block, not by name.
 
-Known consequence: the real file spells `Céline PREAU` in `S1` and `Céline PREAULT` in `S2`–`S6`, so these produce **two distinct people** in the dropdown. This is intentional and deterministic; if merging is ever desired it is a future enhancement.
+Names are trimmed (whitespace stripped), so `Anais Bouyssounaîs ` and `Anais Bouyssounaîs` are the same person. The person list is built from week `S1`; each later week's row at index `i` is assigned to the person at index `i` from `S1`.
+
+Known consequence: the real file spells `Céline PREAU` in `S1` and `Céline PREAULT` in `S2`–`S6`; index-based matching assigns both spellings to the single `S1` person `Céline PREAU`, so the dropdown shows **one** Céline.
 
 ## Architecture
 
@@ -123,7 +125,7 @@ The effective `startDate` used for rotation is stored **only** in `config.json` 
 
 - Use the sheet that contains the `S1`..`S6` blocks (the active sheet); ignore other sheets (e.g. `Feuil1`).
 - Locate weekly blocks by `S<n>` in column A.
-- Build the person list from the `S1` block. Within a block: person rows (a name in column A) are followed by a role/ETP row (`ES`, `TISF`, `Educ` prefix). Later weeks' person rows are matched by trimmed name per D10.
+- Build the canonical person list from the `S1` block only. Within a block: person rows (a name in column A) are followed by a role/ETP row (`ES`, `TISF`, `Educ` prefix). Later weeks' person rows are matched to the `S1` people **by row index** (D10).
 - Each day = 4 columns (AM start, AM end, PM start, PM end) → up to 2 slots.
 - Cell interpretation:
   - `datetime.time` → slot.
