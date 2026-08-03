@@ -133,7 +133,7 @@ The effective `startDate` used for rotation is stored **only** in `config.json` 
   - time-like text (lenient: `:`, `;`, `h`) → slot.
   - empty → `none`.
 - Ignore the `TOTAL` column (`AD`) and any trailing/aggregate columns (`AE`).
-- Sheet name → `startDate` (pre-fills `config.json`, editable later).
+- Sheet name → `startDate` (pre-fills `config.json`, editable later): the day + French month are parsed from the sheet name (e.g. `27Juillet` → day 27, July). The **year** is parsed from the uploaded file's original filename (e.g. `...Aout 2026.xlsx` → 2026); if no 4-digit year is found, the current year is used.
 
 ## API
 
