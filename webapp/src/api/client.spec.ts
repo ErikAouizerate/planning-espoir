@@ -2,13 +2,22 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fetchAuthMe, fetchPlanning, fetchSchedule } from './client';
 
 const tokenMock = vi.hoisted(() => vi.fn());
+const isEnabledMock = vi.hoisted(() => vi.fn());
+const loginMock = vi.hoisted(() => vi.fn());
 vi.mock('../auth/keycloak', () => ({
-  keycloak: { getToken: () => tokenMock() },
+  keycloak: {
+    getToken: () => tokenMock(),
+    isEnabled: () => isEnabledMock(),
+    login: () => loginMock(),
+  },
 }));
 
 describe('api client', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
+    isEnabledMock.mockReset();
+    loginMock.mockReset();
+    tokenMock.mockReset();
   });
 
   afterEach(() => {
@@ -47,5 +56,23 @@ describe('api client', () => {
     const [url, init] = vi.mocked(fetch).mock.calls[0];
     expect(String(url)).toBe('/api/auth/me');
     expect((init?.headers as Headers).get('Authorization')).toBe('Bearer token-123');
+  });
+
+  it('triggers the keycloak login flow on a 401 when auth is enabled', async () => {
+    isEnabledMock.mockReturnValue(true);
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({ statusCode: 401, message: 'Unauthorized' }), { status: 401 }),
+    );
+    await expect(fetchPlanning()).rejects.toThrow('Unauthorized');
+    expect(loginMock).toHaveBeenCalled();
+  });
+
+  it('does not trigger the keycloak login flow on a 401 when auth is disabled', async () => {
+    isEnabledMock.mockReturnValue(false);
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({ statusCode: 401, message: 'Unauthorized' }), { status: 401 }),
+    );
+    await expect(fetchPlanning()).rejects.toThrow('Unauthorized');
+    expect(loginMock).not.toHaveBeenCalled();
   });
 });

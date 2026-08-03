@@ -11,11 +11,17 @@ export function getAuthToken(): string | null {
   return keycloak.getToken();
 }
 
+let redirecting = false;
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = getAuthToken();
   const headers = new Headers(init.headers);
   if (token) headers.set('Authorization', `Bearer ${token}`);
   const res = await fetch(path, { ...init, headers });
+  if (res.status === 401 && keycloak.isEnabled() && !redirecting) {
+    redirecting = true;
+    keycloak.login();
+  }
   if (!res.ok) {
     let message = `Request failed (${res.status})`;
     try {

@@ -40,10 +40,12 @@ describe('keycloak wrapper', () => {
     expect(keycloak.getUsername()).toBe('test-user');
     expect(keycloak.getToken()).toBeNull();
     keycloak.signout();
+    keycloak.login();
     expect(mocks.kcLogout).not.toHaveBeenCalled();
+    expect(mocks.kcLogin).not.toHaveBeenCalled();
   });
 
-  it('initializes keycloak and reads the username from the token when enabled', async () => {
+  it('initializes keycloak with onLoad login-required and reads the username when enabled', async () => {
     vi.stubEnv('VITE_AUTH_ENABLED', 'true');
     mocks.kcInit.mockResolvedValue(undefined);
     mocks.kcToken.mockReturnValue('abc.def.ghi');
@@ -51,8 +53,15 @@ describe('keycloak wrapper', () => {
     const { keycloak } = await import('./keycloak');
     expect(keycloak.isEnabled()).toBe(true);
     await keycloak.init();
-    expect(mocks.kcInit).toHaveBeenCalled();
+    expect(mocks.kcInit).toHaveBeenCalledWith({ onLoad: 'login-required' });
     expect(keycloak.getToken()).toBe('abc.def.ghi');
     expect(keycloak.getUsername()).toBe('admin@example.com');
+  });
+
+  it('starts the keycloak login flow when enabled', async () => {
+    vi.stubEnv('VITE_AUTH_ENABLED', 'true');
+    const { keycloak } = await import('./keycloak');
+    keycloak.login();
+    expect(mocks.kcLogin).toHaveBeenCalled();
   });
 });

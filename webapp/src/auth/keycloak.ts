@@ -4,6 +4,7 @@ import { MOCK_USERNAME } from './username';
 
 export interface KeycloakApi {
   init(): Promise<void>;
+  login(): void;
   isEnabled(): boolean;
   getToken(): string | null;
   getUsername(): string;
@@ -13,6 +14,9 @@ export interface KeycloakApi {
 function createDisabled(): KeycloakApi {
   return {
     async init() {
+      // no-op in mock mode
+    },
+    login: () => {
       // no-op in mock mode
     },
     isEnabled: () => false,
@@ -33,6 +37,9 @@ function createEnabled(): KeycloakApi {
   return {
     async init() {
       await keycloak.init({ onLoad: 'login-required' });
+    },
+    login: () => {
+      void keycloak.login();
     },
     isEnabled: () => true,
     getToken: () => keycloak.token ?? null,

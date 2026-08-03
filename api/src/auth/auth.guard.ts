@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { JWTClaimValidationFailed, JWTExpired, JWSSignatureVerificationFailed } from 'jose/errors';
 import { MOCK_USERNAME } from './identity';
 
 export interface AuthenticatedRequest extends Request {
@@ -56,10 +57,9 @@ export class AuthGuard implements CanActivate {
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
       if (
-        error &&
-        typeof error === 'object' &&
-        'code' in error &&
-        error.code === 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED'
+        error instanceof JWTExpired ||
+        error instanceof JWTClaimValidationFailed ||
+        error instanceof JWSSignatureVerificationFailed
       ) {
         throw new UnauthorizedException('Invalid token');
       }
