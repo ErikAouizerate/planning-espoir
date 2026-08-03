@@ -46,6 +46,12 @@ describe('parsePlanning', () => {
     expect(parsed.startDate).toBe('2026-07-27');
   });
 
+  it('throws PlanningFormatError for a non-xlsx buffer', async () => {
+    await expect(parsePlanning(Buffer.from('not an xlsx'), 'notes.txt')).rejects.toThrow(
+      PlanningFormatError,
+    );
+  });
+
   it('throws PlanningFormatError when no S1 block exists', async () => {
     const workbook = new ExcelJS.Workbook();
     workbook.addWorksheet('Empty');

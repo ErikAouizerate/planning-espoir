@@ -163,7 +163,11 @@ function extractStartDate(sheetName: string, fileName: string): string | null {
 
 export async function parsePlanning(buffer: Buffer, fileName: string): Promise<ParsedPlanning> {
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(buffer as unknown as ArrayBuffer);
+  try {
+    await workbook.xlsx.load(buffer as unknown as ArrayBuffer);
+  } catch {
+    throw new PlanningFormatError('Not a valid Excel workbook');
+  }
 
   const sheet = findPlanningSheet(workbook);
   if (!sheet) throw new PlanningFormatError('No S1..S6 week block found');
