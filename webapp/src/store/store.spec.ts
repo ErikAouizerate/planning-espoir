@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { planningFetchRequested, scheduleFetchRequested, selectionToggle } from './actions';
+import { planningFetchError, scheduleFetchRequested, selectionToggle } from './actions';
 import { configureStore } from './store';
 
 describe('store', () => {
@@ -22,10 +22,7 @@ describe('store', () => {
 
   it('records a fetch error on the planning slice', () => {
     const store = configureStore();
-    store.dispatch(planningFetchRequested());
-    // middleware runs asynchronously against real fetch in Node? no — provide no server;
-    // assert at least the synchronous transition happens through a reducer-only action
-    store.dispatch({ type: 'PLANNING_FETCH_ERROR', error: 'boom' });
+    store.dispatch(planningFetchError('boom'));
     expect(store.getState().planning.status).toBe('error');
     expect(store.getState().planning.error).toBe('boom');
   });

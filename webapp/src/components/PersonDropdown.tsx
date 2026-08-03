@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useClickOutside } from "../hooks/useClickOutside";
-import { selectionToggle } from "../store/actions";
-import type { RootState } from "../store/types";
+import { useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useClickOutside } from '../hooks/useClickOutside';
+import { selectionToggle } from '../store/actions';
+import type { RootState } from '../store/types';
 
 export function PersonDropdown() {
   const dispatch = useDispatch();
@@ -10,12 +10,11 @@ export function PersonDropdown() {
   const selection = useSelector((state: RootState) => state.selection.names);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { config, status } = useSelector((state: RootState) => state.config);
+  const { status } = useSelector((state: RootState) => state.config);
 
   useClickOutside(containerRef, () => setOpen(false));
 
-  console.log("config.defaultName", config.defaultName);
-  if (status !== "loaded") {
+  if (status !== 'loaded') {
     return null;
   }
   return (
@@ -38,7 +37,6 @@ export function PersonDropdown() {
                 <input
                   type="checkbox"
                   checked={selection.includes(p.name)}
-                  defaultValue={config.defaultName ?? ""}
                   onChange={() => dispatch(selectionToggle(p.name))}
                 />
                 {p.name}

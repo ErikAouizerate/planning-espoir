@@ -80,6 +80,14 @@ Known consequence: the real file spells `Céline PREAU` in `S1` and `Céline PRE
 
 The original uploaded file name is stored in `config.json` as `fileName` (pre-filled on upload, kept across consultations) and returned by `GET /planning/config`. The webapp shows it as a subtitle in the header.
 
+### D11b: Default config user pre-selected on open
+
+When the app opens and the config's `defaultName` is set, that person is pre-selected in the multi-select (matching the stored preference), so the calendar reflects the saved choice without manual selection. Applied on config fetch.
+
+### D11c: Webapp container port 8081
+
+The docker-compose webapp service maps host port **8081** (not 8080) to the nginx container port 80, to avoid conflicts with other applications on the host.
+
 ### D12: Config modal rework
 
 - **Default name**: chosen from a dropdown listing the people of the planning (with an "Aucun" option to clear), instead of a free-text input.
@@ -91,6 +99,18 @@ The original uploaded file name is stored in `config.json` as `fileName` (pre-fi
 - Google Fonts **Merriweather Sans** (titles) and **Nunito** (content) are bundled via `@fontsource` packages.
 - The calendar is responsive on small screens (day cells shrink, font sizes reduce, no forced horizontal overflow).
 - Day cells are separated by discreet light-gray grid lines.
+
+### D14: Prettier formatting enforced by lint
+
+The repo uses a root Prettier config (`.prettierrc`): single quotes, no semicolon-omission, 100-column width, trailing commas. Prettier is wired into ESLint (`eslint-config-prettier` + `eslint-plugin-prettier`) in both `api/` and `webapp/`, so `yarn lint` enforces formatting. Root scripts `yarn format` (write) and `yarn format:check` run Prettier across all source and docs files.
+
+### D15: Action creators are the only dispatch API
+
+`webapp/src/store/actions.ts` exports a typed action creator for **every** action type (requested/start/success/error per domain, plus selection). The middleware and all tests dispatch only through imported creators — raw action-object literals are not dispatched anywhere.
+
+### D16: Redux logger in development
+
+`redux-logger` is enabled in the webapp store **only** when `import.meta.env.MODE === 'development'` (so tests and production builds stay silent), configured with `collapsed: false`.
 
 ## Architecture
 
@@ -153,15 +173,16 @@ The effective `startDate` used for rotation is stored **only** in `config.json` 
 
 ## API
 
-| Method | Route | Description |
-|---|---|---|
-| `POST` | `/planning` | Multipart `.xlsx` upload. Parse → write `planning.json` + keep `planning.xlsx`. Read sheet name → pre-fill `startDate` in `config.json`. 400 if not a valid `.xlsx` or no `S1`..`S6` block found. |
-| `GET` | `/planning` | Returns `{ startDate, people }` (names + roles + colors). 404 if no planning uploaded. |
-| `GET` | `/planning/schedule?month=YYYY-MM` | Returns the full month schedule for all people (date→week resolved via rotation). 404 if no planning uploaded; 400 if `month` malformed. |
-| `GET` | `/planning/config` | Returns `{ startDate, defaultName, fileName }`. |
-| `PUT` | `/planning/config` | Updates `startDate`, `defaultName` and/or `fileName` in the flat file. |
+| Method | Route                              | Description                                                                                                                                                                                       |
+| ------ | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST` | `/planning`                        | Multipart `.xlsx` upload. Parse → write `planning.json` + keep `planning.xlsx`. Read sheet name → pre-fill `startDate` in `config.json`. 400 if not a valid `.xlsx` or no `S1`..`S6` block found. |
+| `GET`  | `/planning`                        | Returns `{ startDate, people }` (names + roles + colors). 404 if no planning uploaded.                                                                                                            |
+| `GET`  | `/planning/schedule?month=YYYY-MM` | Returns the full month schedule for all people (date→week resolved via rotation). 404 if no planning uploaded; 400 if `month` malformed.                                                          |
+| `GET`  | `/planning/config`                 | Returns `{ startDate, defaultName, fileName }`.                                                                                                                                                   |
+| `PUT`  | `/planning/config`                 | Updates `startDate`, `defaultName` and/or `fileName` in the flat file.                                                                                                                            |
 
 Responses:
+
 - `schedule` → `{ month, days: { "YYYY-MM-DD": PersonDay[] } }` where `PersonDay = { name, colorIndex, cell: DayCell }`.
 - Errors are standardized as `{ statusCode, message }`.
 - Month arithmetic is done in UTC; no timezone concerns.

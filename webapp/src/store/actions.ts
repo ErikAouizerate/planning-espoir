@@ -1,4 +1,4 @@
-import type { Config } from '@planning-espoir/shared';
+import type { Config, Person, PersonDay, ParsingWarning } from '@planning-espoir/shared';
 
 export const PLANNING_FETCH_REQUESTED = 'PLANNING_FETCH_REQUESTED';
 export const PLANNING_FETCH_START = 'PLANNING_FETCH_START';
@@ -35,12 +35,53 @@ export interface Action<T = string, P = unknown> {
   [key: string]: unknown;
 }
 
+export interface PlanningPayload {
+  startDate: string | null;
+  people: Person[];
+  warnings: ParsingWarning[];
+}
+
+export interface SchedulePayload {
+  month: string;
+  days: Record<string, PersonDay[]>;
+}
+
 export function planningFetchRequested(): Action<typeof PLANNING_FETCH_REQUESTED> {
   return { type: PLANNING_FETCH_REQUESTED };
 }
 
-export function planningUploadRequested(file: File): Action<typeof PLANNING_UPLOAD_REQUESTED, File> {
+export function planningFetchStart(): Action<typeof PLANNING_FETCH_START> {
+  return { type: PLANNING_FETCH_START };
+}
+
+export function planningFetchSuccess(
+  payload: PlanningPayload,
+): Action<typeof PLANNING_FETCH_SUCCESS, PlanningPayload> {
+  return { type: PLANNING_FETCH_SUCCESS, payload };
+}
+
+export function planningFetchError(error: string): Action<typeof PLANNING_FETCH_ERROR> {
+  return { type: PLANNING_FETCH_ERROR, error };
+}
+
+export function planningUploadRequested(
+  file: File,
+): Action<typeof PLANNING_UPLOAD_REQUESTED, File> {
   return { type: PLANNING_UPLOAD_REQUESTED, payload: file };
+}
+
+export function planningUploadStart(): Action<typeof PLANNING_UPLOAD_START> {
+  return { type: PLANNING_UPLOAD_START };
+}
+
+export function planningUploadSuccess(
+  payload: PlanningPayload,
+): Action<typeof PLANNING_UPLOAD_SUCCESS, PlanningPayload> {
+  return { type: PLANNING_UPLOAD_SUCCESS, payload };
+}
+
+export function planningUploadError(error: string): Action<typeof PLANNING_UPLOAD_ERROR> {
+  return { type: PLANNING_UPLOAD_ERROR, error };
 }
 
 export function scheduleFetchRequested(
@@ -49,14 +90,52 @@ export function scheduleFetchRequested(
   return { type: SCHEDULE_FETCH_REQUESTED, payload: month };
 }
 
+export function scheduleFetchStart(month: string): Action<typeof SCHEDULE_FETCH_START, string> {
+  return { type: SCHEDULE_FETCH_START, payload: month };
+}
+
+export function scheduleFetchSuccess(
+  payload: SchedulePayload,
+): Action<typeof SCHEDULE_FETCH_SUCCESS, SchedulePayload> {
+  return { type: SCHEDULE_FETCH_SUCCESS, payload };
+}
+
+export function scheduleFetchError(error: string): Action<typeof SCHEDULE_FETCH_ERROR> {
+  return { type: SCHEDULE_FETCH_ERROR, error };
+}
+
 export function configFetchRequested(): Action<typeof CONFIG_FETCH_REQUESTED> {
   return { type: CONFIG_FETCH_REQUESTED };
+}
+
+export function configFetchStart(): Action<typeof CONFIG_FETCH_START> {
+  return { type: CONFIG_FETCH_START };
+}
+
+export function configFetchSuccess(payload: Config): Action<typeof CONFIG_FETCH_SUCCESS, Config> {
+  return { type: CONFIG_FETCH_SUCCESS, payload };
+}
+
+export function configFetchError(error: string): Action<typeof CONFIG_FETCH_ERROR> {
+  return { type: CONFIG_FETCH_ERROR, error };
 }
 
 export function configUpdateRequested(
   update: Partial<Config>,
 ): Action<typeof CONFIG_UPDATE_REQUESTED, Partial<Config>> {
   return { type: CONFIG_UPDATE_REQUESTED, payload: update };
+}
+
+export function configUpdateStart(): Action<typeof CONFIG_UPDATE_START> {
+  return { type: CONFIG_UPDATE_START };
+}
+
+export function configUpdateSuccess(payload: Config): Action<typeof CONFIG_UPDATE_SUCCESS, Config> {
+  return { type: CONFIG_UPDATE_SUCCESS, payload };
+}
+
+export function configUpdateError(error: string): Action<typeof CONFIG_UPDATE_ERROR> {
+  return { type: CONFIG_UPDATE_ERROR, error };
 }
 
 export function selectionToggle(name: string): Action<typeof SELECTION_TOGGLE, string> {

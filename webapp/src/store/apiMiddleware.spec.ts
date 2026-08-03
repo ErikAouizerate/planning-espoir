@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { planningUploadRequested } from './actions';
+import { configFetchRequested, planningUploadRequested, scheduleFetchStart } from './actions';
 import { configureStore } from './store';
 
 describe('apiMiddleware', () => {
@@ -9,6 +9,48 @@ describe('apiMiddleware', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it('selects the default config user after a config fetch', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ startDate: '2026-07-27', defaultName: 'TAUZIN Caroline', fileName: null }),
+        { status: 200 },
+      ),
+    );
+
+    const store = configureStore();
+    store.dispatch({
+      type: 'PLANNING_FETCH_SUCCESS',
+      payload: {
+        startDate: '2026-07-27',
+        people: [{ name: 'TAUZIN Caroline', role: 'R', colorIndex: 0, weeks: [] }],
+        warnings: [],
+      },
+    });
+
+    store.dispatch(configFetchRequested());
+
+    await vi.waitFor(() => {
+      expect(store.getState().selection.names).toContain('TAUZIN Caroline');
+    });
+  });
+
+  it('does not select anything when the default name is null', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ startDate: null, defaultName: null, fileName: null }), {
+        status: 200,
+      }),
+    );
+
+    const store = configureStore();
+    store.dispatch(configFetchRequested());
+
+    await vi.waitFor(() => {
+      expect(store.getState().selection.names).toEqual([]);
+    });
   });
 
   it('refetches config after a successful planning upload', async () => {
@@ -27,10 +69,7 @@ describe('apiMiddleware', () => {
     );
     // 2. config refetch (dispatched before the schedule refetch)
     fetchMock.mockResolvedValueOnce(
-      new Response(
-        JSON.stringify({ startDate: '2026-07-27', defaultName: null }),
-        { status: 200 },
-      ),
+      new Response(JSON.stringify({ startDate: '2026-07-27', defaultName: null }), { status: 200 }),
     );
     // 3. schedule fetch after upload
     fetchMock.mockResolvedValueOnce(
@@ -39,7 +78,7 @@ describe('apiMiddleware', () => {
 
     const store = configureStore();
     // seed the displayed month so the schedule refetch fires
-    store.dispatch({ type: 'SCHEDULE_FETCH_START', payload: '2026-08' });
+    store.dispatch(scheduleFetchStart('2026-08'));
 
     store.dispatch(planningUploadRequested(new File(['x'], 'planning.xlsx')));
 
