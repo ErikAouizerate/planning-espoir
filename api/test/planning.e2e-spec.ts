@@ -68,7 +68,7 @@ describe('Planning (e2e)', () => {
     const monday = res.body.days['2026-08-03'];
     expect(monday).toHaveLength(2);
     // S2 Monday for person 0 is 08:30-12:00
-    expect(monday[0]).toMatchObject({ name: 'TAUZIN Caroline' });
+    expect(monday[0]).toMatchObject({ name: 'BOB Dylan' });
     expect(monday[0].cell).toEqual({
       type: 'shift',
       slots: [{ start: '08:30', end: '12:00' }],
@@ -85,7 +85,7 @@ describe('Planning (e2e)', () => {
       .expect(200);
     const tuesday = res.body.days['2026-07-28']; // S1 Tuesday
     expect(tuesday).toHaveLength(2);
-    expect(tuesday[0]).toMatchObject({ name: 'TAUZIN Caroline' });
+    expect(tuesday[0]).toMatchObject({ name: 'BOB Dylan' });
     expect(tuesday[0].cell).toEqual({ type: 'off', label: 'rh' });
   });
 

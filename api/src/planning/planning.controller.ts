@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Config } from '@planning-espoir/shared';
+import type { MulterFile } from './multer-file';
 import { PlanningService } from './planning.service';
 
 @Controller('planning')
@@ -18,7 +19,7 @@ export class PlanningController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  upload(@UploadedFile() file: Express.Multer.File) {
+  upload(@UploadedFile() file: MulterFile) {
     return this.planningService.upload(file);
   }
 

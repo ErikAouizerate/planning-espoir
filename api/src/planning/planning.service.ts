@@ -15,6 +15,7 @@ import {
 } from './date-rotation';
 import { parsePlanning, PlanningFormatError } from './parser';
 import { Storage } from './storage';
+import type { MulterFile } from './multer-file';
 
 export interface PlanningResponse {
   startDate: string | null;
@@ -26,7 +27,7 @@ export interface PlanningResponse {
 export class PlanningService {
   constructor(private readonly storage: Storage) {}
 
-  async upload(file: Express.Multer.File): Promise<PlanningResponse> {
+  async upload(file: MulterFile): Promise<PlanningResponse> {
     if (!file) throw new BadRequestException('file is required');
     let parsed;
     try {
