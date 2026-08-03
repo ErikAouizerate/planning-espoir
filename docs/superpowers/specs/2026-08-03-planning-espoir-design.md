@@ -112,6 +112,22 @@ The repo uses a root Prettier config (`.prettierrc`): single quotes, no semicolo
 
 `redux-logger` is enabled in the webapp store **only** when `import.meta.env.MODE === 'development'` (so tests and production builds stay silent), configured with `collapsed: false`.
 
+### D17: Current day highlighted
+
+The calendar highlights today's cell (UTC) with a light blue background (`bg-blue-50`), so the current day stands out in the month grid.
+
+### D18: Redux Toolkit store setup
+
+The webapp store is created with Redux Toolkit's `configureStore` (eliminating the `createStore` deprecation warning) while keeping the project's plain classic reducers and custom middleware — thunk is explicitly disabled (`getDefaultMiddleware({ thunk: false }).concat(...)`) and no slices or `createReducer` are used, honoring the AGENTS.md Redux constraints. Component specs build their test stores through `webapp/src/test/store.ts` (`createTestStore`) with the same `configureStore` + preloaded state.
+
+### D19: Local multer file type
+
+Instead of referencing the global `Express.Multer.File` namespace (which produces an IDE warning under `@types/express@5`), the API defines its own `MulterFile` interface in `api/src/planning/multer-file.ts` and uses it for the upload handler and service.
+
+### D20: Jest types for API specs
+
+`api/tsconfig.json` sets `"types": ["node", "jest"]` so `describe`/`it`/`expect` globals resolve in the API test files (removing the "Cannot find name 'describe'" IDE warning).
+
 ## Architecture
 
 ```
