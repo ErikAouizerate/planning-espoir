@@ -75,4 +75,44 @@ describe('api client', () => {
     await expect(fetchPlanning()).rejects.toThrow('Unauthorized');
     expect(loginMock).not.toHaveBeenCalled();
   });
+
+  it('redirects to the gateway URL on a 403 when auth is enabled', async () => {
+    vi.resetModules();
+    isEnabledMock.mockReturnValue(true);
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({ statusCode: 403, message: 'Forbidden' }), { status: 403 }),
+    );
+    const { fetchPlanning: freshFetchPlanning } = await import('./client');
+    const assignSpy = vi.fn();
+    const originalLocation = window.location;
+    Object.defineProperty(window, 'location', {
+      value: { ...originalLocation, assign: assignSpy, href: originalLocation.href },
+      writable: true,
+    });
+    try {
+      await expect(freshFetchPlanning()).rejects.toThrow('Forbidden');
+      expect(assignSpy).toHaveBeenCalledWith('http://localhost:5173');
+    } finally {
+      Object.defineProperty(window, 'location', { value: originalLocation, writable: true });
+    }
+  });
+
+  it('does not redirect on a 403 when auth is disabled', async () => {
+    isEnabledMock.mockReturnValue(false);
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({ statusCode: 403, message: 'Forbidden' }), { status: 403 }),
+    );
+    const assignSpy = vi.fn();
+    const originalLocation = window.location;
+    Object.defineProperty(window, 'location', {
+      value: { ...originalLocation, assign: assignSpy, href: originalLocation.href },
+      writable: true,
+    });
+    try {
+      await expect(fetchPlanning()).rejects.toThrow('Forbidden');
+      expect(assignSpy).not.toHaveBeenCalled();
+    } finally {
+      Object.defineProperty(window, 'location', { value: originalLocation, writable: true });
+    }
+  });
 });

@@ -20,6 +20,7 @@ export interface AuthenticatedRequest extends Request {
 export interface AuthGuardOptions {
   authEnabled: boolean;
   issuer?: string;
+  appGroup?: string;
 }
 
 @Injectable()
@@ -55,7 +56,7 @@ export class AuthGuard implements CanActivate {
         issuer: this.options.issuer,
       });
       const groups = (payload.groups as string[] | undefined) ?? [];
-      if (!groups.includes(APP_GROUP)) {
+      if (!groups.includes(this.options.appGroup ?? APP_GROUP)) {
         throw new ForbiddenException('User is not allowed to access this application');
       }
       const username = (payload.preferred_username as string | undefined) ?? null;

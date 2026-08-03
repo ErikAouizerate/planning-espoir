@@ -1008,3 +1008,13 @@ No TODOs/TBDs. All code blocks are complete.
 ## Addendum — Group-based access control (D-AUTH-9)
 
 Implemented after the initial plan: `AuthGuard` now requires the token's `groups` claim to include `app-planning-espoir` (constant `APP_GROUP` in `api/src/auth/auth.guard.ts`); otherwise it throws `ForbiddenException` (403). In mock mode (auth disabled) groups are ignored. Added unit tests in `auth.guard.spec.ts` for: valid token in group → 200; valid token not in group → 403; missing groups claim → 403. Spec updated with D-AUTH-9.
+
+## Addendum — Gateway redirect on 403 (D-AUTH-10)
+
+Implemented after the initial plan and the group-access addendum: on a **403** (user authenticated but not in the required app group), the webapp client redirects to the gateway URL so the user can see which applications they can access.
+
+- `webapp/src/auth/config.ts`: `authConfig` gained `gatewayUrl` (`VITE_GATEWAY_URL`, default `http://localhost:5173`) and `appGroup` (`VITE_APP_GROUP`, default `app-planning-espoir`).
+- `webapp/src/api/client.ts`: on `res.status === 403`, when auth is enabled and no redirect is in progress, calls `window.location.assign(authConfig.gatewayUrl)`.
+- `api/src/auth/auth.guard.ts`: the required group is now read from `AuthGuardOptions.appGroup` (default `APP_GROUP`); `api/src/auth/auth.module.ts` supplies it from `KEYCLOAK_APP_GROUP` (`api/.env`, default `app-planning-espoir`).
+- Env files updated (`VITE_GATEWAY_URL`, `VITE_APP_GROUP`; `KEYCLOAK_APP_GROUP`).
+- Tests: config (gatewayUrl/appGroup defaults), client (403 → `location.assign(gatewayUrl)` when enabled, none when disabled), guard (custom `appGroup` honored). Spec updated with D-AUTH-10.

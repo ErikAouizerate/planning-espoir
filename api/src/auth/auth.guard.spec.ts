@@ -39,6 +39,14 @@ function enabledGuard(): AuthGuard {
   });
 }
 
+function guardWithGroup(group: string): AuthGuard {
+  return new AuthGuard({
+    authEnabled: true,
+    issuer: 'http://localhost:8080/realms/gateway',
+    appGroup: group,
+  });
+}
+
 describe('AuthGuard', () => {
   beforeEach(() => {
     mockJwtVerify.mockReset();
@@ -87,6 +95,25 @@ describe('AuthGuard', () => {
     mockJwtVerify.mockResolvedValue({ payload: { preferred_username: 'user@example.com' } });
     await expect(
       enabledGuard().canActivate(makeContext({ authorization: 'Bearer abc.def.ghi' })),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+  });
+
+  it('accepts a custom app group from the guard options', async () => {
+    mockJwtVerify.mockResolvedValue({
+      payload: { preferred_username: 'admin@example.com', groups: ['app-other'] },
+    });
+    const ctx = makeContext({ authorization: 'Bearer abc.def.ghi' });
+    await expect(guardWithGroup('app-other').canActivate(ctx)).resolves.toBe(true);
+  });
+
+  it('rejects when a custom app group is not in the token groups', async () => {
+    mockJwtVerify.mockResolvedValue({
+      payload: { preferred_username: 'admin@example.com', groups: ['app-other'] },
+    });
+    await expect(
+      guardWithGroup('app-planning-espoir').canActivate(
+        makeContext({ authorization: 'Bearer abc.def.ghi' }),
+      ),
     ).rejects.toBeInstanceOf(ForbiddenException);
   });
 

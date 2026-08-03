@@ -1,4 +1,5 @@
 import type { Config, Person, ParsingWarning, ScheduleMonth } from '@planning-espoir/shared';
+import { authConfig } from '../auth/config';
 import { keycloak } from '../auth/keycloak';
 
 export interface PlanningResponse {
@@ -21,6 +22,10 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (res.status === 401 && keycloak.isEnabled() && !redirecting) {
     redirecting = true;
     keycloak.login();
+  }
+  if (res.status === 403 && keycloak.isEnabled() && !redirecting) {
+    redirecting = true;
+    window.location.assign(authConfig.gatewayUrl);
   }
   if (!res.ok) {
     let message = `Request failed (${res.status})`;

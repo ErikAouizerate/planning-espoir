@@ -3,6 +3,8 @@ export interface AuthConfig {
   url: string;
   realm: string;
   clientId: string;
+  gatewayUrl: string;
+  appGroup: string;
 }
 
 function str(value: string | undefined, fallback: string): string {
@@ -14,4 +16,6 @@ export const authConfig: AuthConfig = {
   url: str(import.meta.env.VITE_KEYCLOAK_URL, 'http://localhost:8080'),
   realm: str(import.meta.env.VITE_KEYCLOAK_REALM, 'gateway'),
   clientId: str(import.meta.env.VITE_KEYCLOAK_CLIENT_ID, 'gateway'),
+  gatewayUrl: str(import.meta.env.VITE_GATEWAY_URL, 'http://localhost:5173'),
+  appGroup: str(import.meta.env.VITE_APP_GROUP, 'app-planning-espoir'),
 };
