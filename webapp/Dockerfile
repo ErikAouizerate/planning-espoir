@@ -1,6 +1,6 @@
 FROM node:22-alpine AS build
 WORKDIR /app
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock tsconfig.base.json ./
 COPY shared/package.json shared/
 COPY api/package.json api/
 COPY webapp/package.json webapp/
