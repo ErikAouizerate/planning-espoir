@@ -33,6 +33,7 @@ export interface PlanningData {
 export interface Config {
   startDate: string | null; // "YYYY-MM-DD"
   defaultName: string | null;
+  fileName: string | null; // original name of the uploaded planning file
 }
 
 export interface ParsingWarning {

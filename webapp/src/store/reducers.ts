@@ -45,7 +45,7 @@ const initialSchedule: ScheduleState = {
 
 const initialConfig: ConfigState = {
   status: 'idle',
-  config: { startDate: null, defaultName: null },
+  config: { startDate: null, defaultName: null, fileName: null },
   error: null,
 };
 

@@ -21,7 +21,7 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
       error: null,
     },
     selection: { names: [] },
-    config: { status: 'loaded', config: { startDate: null, defaultName: null }, error: null },
+    config: { status: 'loaded', config: { startDate: null, defaultName: null, fileName: null }, error: null },
     colors: { palette: ['#ff0000'] },
     ...overrides,
   };
@@ -66,7 +66,7 @@ describe('App', () => {
     const store = createStore(
       rootReducer,
       makeState({
-        config: { status: 'error', config: { startDate: null, defaultName: null }, error: 'Config fetch failed' },
+        config: { status: 'error', config: { startDate: null, defaultName: null, fileName: null }, error: 'Config fetch failed' },
       }),
     );
     render(

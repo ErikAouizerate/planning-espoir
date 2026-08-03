@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { monthGrid, weekdayLabel } from '../utils/dates';
+import { monthGrid, monthLabel, weekdayLabel } from '../utils/dates';
 import type { RootState } from '../store/types';
 import { DayCell } from './DayCell';
 
@@ -13,8 +13,10 @@ export function MonthCalendar() {
   const grid = monthGrid(month);
 
   return (
-    <div className="overflow-x-auto">
-      <div className="grid grid-cols-7 min-w-[700px]">
+    <div>
+      <h2 className="mb-2 text-center text-lg font-semibold text-slate-800">{monthLabel(month)}</h2>
+      <div className="overflow-x-auto">
+        <div className="grid grid-cols-7 min-w-[700px]">
         {Array.from({ length: 7 }, (_, i) => (
           <div key={i} className="border-b border-slate-200 px-2 py-1 text-center text-xs font-semibold text-slate-500">
             {weekdayLabel(i)}
@@ -37,6 +39,7 @@ export function MonthCalendar() {
             </div>
           );
         })}
+        </div>
       </div>
     </div>
   );

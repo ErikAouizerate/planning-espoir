@@ -97,7 +97,11 @@ describe('Planning (e2e)', () => {
 
   it('round-trips config via GET/PUT', async () => {
     const before = await request(app.getHttpServer()).get('/api/planning/config').expect(200);
-    expect(before.body).toEqual({ startDate: '2026-07-27', defaultName: null });
+    expect(before.body).toEqual({
+      startDate: '2026-07-27',
+      defaultName: null,
+      fileName: 'Copie de Planning ecluse Proposition Aout 2026.xlsx',
+    });
     const put = await request(app.getHttpServer())
       .put('/api/planning/config')
       .send({ startDate: '2026-08-01' })

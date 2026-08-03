@@ -40,12 +40,13 @@ describe('PlanningController', () => {
   });
 
   it('delegates config get/put to the service', async () => {
-    service.getConfig.mockResolvedValue({ startDate: null, defaultName: null });
-    await expect(controller.getConfig()).resolves.toEqual({ startDate: null, defaultName: null });
-    service.updateConfig.mockResolvedValue({ startDate: '2026-07-27', defaultName: null });
+    service.getConfig.mockResolvedValue({ startDate: null, defaultName: null, fileName: null });
+    await expect(controller.getConfig()).resolves.toEqual({ startDate: null, defaultName: null, fileName: null });
+    service.updateConfig.mockResolvedValue({ startDate: '2026-07-27', defaultName: null, fileName: null });
     await expect(controller.updateConfig({ startDate: '2026-07-27' })).resolves.toEqual({
       startDate: '2026-07-27',
       defaultName: null,
+      fileName: null,
     });
     expect(service.updateConfig).toHaveBeenCalledWith({ startDate: '2026-07-27' });
   });

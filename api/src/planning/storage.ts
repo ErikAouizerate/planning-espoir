@@ -29,7 +29,7 @@ export class Storage {
 
   async loadConfig(): Promise<Config> {
     const config = await this.readJson<Config>('config.json');
-    return config ?? { startDate: null, defaultName: null };
+    return config ?? { startDate: null, defaultName: null, fileName: null };
   }
 
   async saveConfig(config: Config): Promise<void> {

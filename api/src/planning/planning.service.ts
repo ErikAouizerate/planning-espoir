@@ -37,10 +37,11 @@ export class PlanningService {
       warnings: parsed.warnings,
     });
     const config = await this.storage.loadConfig();
+    config.fileName = file.originalname;
     if (parsed.startDate !== null) {
       config.startDate = parsed.startDate;
-      await this.storage.saveConfig(config);
     }
+    await this.storage.saveConfig(config);
     return {
       startDate: parsed.startDate,
       people: parsed.planning.people,

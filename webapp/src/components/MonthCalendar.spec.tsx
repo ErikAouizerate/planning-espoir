@@ -29,7 +29,7 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
       error: null,
     },
     selection: { names: ['A', 'B'] },
-    config: { status: 'loaded', config: { startDate: '2026-07-27', defaultName: null }, error: null },
+    config: { status: 'loaded', config: { startDate: '2026-07-27', defaultName: null, fileName: null }, error: null },
     colors: { palette: ['#ff0000', '#00ff00'] },
     ...overrides,
   };
@@ -55,5 +55,14 @@ describe('MonthCalendar', () => {
     );
     expect(screen.getByText('09:00–13:00')).toBeInTheDocument();
     expect(screen.getByText('rh')).toBeInTheDocument();
+  });
+
+  it('shows the displayed month and year above the grid', () => {
+    render(
+      <Provider store={createStore(rootReducer, makeState())}>
+        <MonthCalendar />
+      </Provider>,
+    );
+    expect(screen.getByRole('heading', { name: 'août 2026' })).toBeInTheDocument();
   });
 });
