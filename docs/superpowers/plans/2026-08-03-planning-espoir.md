@@ -27,6 +27,7 @@
 Set up the workspace root, the `shared/` types package, and record the design decisions as ADRs.
 
 **Files:**
+
 - Create: `package.json`
 - Create: `tsconfig.base.json`
 - Create: `.gitignore`
@@ -41,6 +42,7 @@ Set up the workspace root, the `shared/` types package, and record the design de
 - Create: `docs/adr/0005-frontend-state-and-ux.md`
 
 **Interfaces:**
+
 - Consumes: nothing.
 - Produces: package `@planning-espoir/shared` with `main`/`types` → `dist/index.js`/`dist/index.d.ts` after `yarn workspace @planning-espoir/shared build`. Domain types used by api and webapp in later tasks.
 
@@ -138,9 +140,7 @@ export interface Slot {
 }
 
 export type DayCell =
-  | { type: 'shift'; slots: Slot[] }
-  | { type: 'off'; label: string }
-  | { type: 'none' };
+  { type: 'shift'; slots: Slot[] } | { type: 'off'; label: string } | { type: 'none' };
 
 export interface Person {
   name: string;
@@ -218,6 +218,7 @@ git commit -m "feat: scaffold monorepo workspace and shared types"
 Set up the NestJS API workspace with a health endpoint and wired test/lint/typecheck/build tooling.
 
 **Files:**
+
 - Create: `api/package.json`
 - Create: `api/tsconfig.json`
 - Create: `api/tsconfig.build.json`
@@ -232,6 +233,7 @@ Set up the NestJS API workspace with a health endpoint and wired test/lint/typec
 - Create: `api/test/health.e2e-spec.ts`
 
 **Interfaces:**
+
 - Consumes: `@planning-espoir/shared` (built dist).
 - Produces: NestJS app bootstrapped with global prefix `api` and CORS enabled on port `PORT ?? 3000`.
 
@@ -486,6 +488,7 @@ git commit -m "feat: scaffold NestJS API workspace with health endpoint"
 Implement the pure domain logic: date→week rotation and the Excel parser, with unit tests.
 
 **Files:**
+
 - Create: `api/src/planning/date-rotation.ts`
 - Create: `api/src/planning/date-rotation.spec.ts`
 - Create: `api/src/planning/parser.ts`
@@ -494,6 +497,7 @@ Implement the pure domain logic: date→week rotation and the Excel parser, with
 - Modify: `api/src/app.module.ts`
 
 **Interfaces:**
+
 - Consumes: `@planning-espoir/shared` types.
 - Produces:
   - `weekIndexForDate(startDate: string, date: string): number` — 0-based S1..S6 index, Euclidean modulo (valid before startDate).
@@ -508,11 +512,7 @@ Implement the pure domain logic: date→week rotation and the Excel parser, with
 `api/src/planning/date-rotation.spec.ts`:
 
 ```ts
-import {
-  monthDays,
-  weekIndexForDate,
-  weekdayIndex,
-} from './date-rotation';
+import { monthDays, weekIndexForDate, weekdayIndex } from './date-rotation';
 
 describe('date-rotation', () => {
   const start = '2026-07-27'; // a Monday
@@ -607,7 +607,7 @@ export async function buildPlanningBuffer(): Promise<Buffer> {
 
   ws.getCell(2, 6).value = 'PLANNING ACCUEIL URGENCE ECLUSE';
   ws.getCell(4, 1).value = 'S1';
-  dayNames.forEach((name, i) => ws.getCell(4, 2 + i * 4).value = name);
+  dayNames.forEach((name, i) => (ws.getCell(4, 2 + i * 4).value = name));
   ws.getCell(4, 30).value = 'TOTAL';
 
   // S1: person rows 6 and 8, role rows 7 and 9
@@ -622,7 +622,7 @@ export async function buildPlanningBuffer(): Promise<Buffer> {
 
   // S2: same people, different Monday times for person 0
   ws.getCell(11, 1).value = 'S2';
-  dayNames.forEach((name, i) => ws.getCell(11, 2 + i * 4).value = name);
+  dayNames.forEach((name, i) => (ws.getCell(11, 2 + i * 4).value = name));
   ws.getCell(13, 1).value = people[0];
   ws.getCell(13, 2).value = time(8, 30);
   ws.getCell(13, 3).value = time(12, 0);
@@ -634,7 +634,7 @@ export async function buildPlanningBuffer(): Promise<Buffer> {
   for (let w = 3; w <= 6; w++) {
     const headerRow = 18 + (w - 3) * 5;
     ws.getCell(headerRow, 1).value = `S${w}`;
-    dayNames.forEach((name, i) => ws.getCell(headerRow, 2 + i * 4).value = name);
+    dayNames.forEach((name, i) => (ws.getCell(headerRow, 2 + i * 4).value = name));
     ws.getCell(headerRow + 2, 1).value = people[0];
     ws.getCell(headerRow + 3, 1).value = roles[0];
     ws.getCell(headerRow + 4, 1).value = people[1];
@@ -659,7 +659,10 @@ import { parsePlanning, PlanningFormatError } from './parser';
 
 describe('parsePlanning', () => {
   it('parses people, roles and color indexes from S1', async () => {
-    const parsed = await parsePlanning(await buildPlanningBuffer(), 'Copie de Planning ecluse Proposition Aout 2026.xlsx');
+    const parsed = await parsePlanning(
+      await buildPlanningBuffer(),
+      'Copie de Planning ecluse Proposition Aout 2026.xlsx',
+    );
     expect(parsed.planning.people).toHaveLength(2);
     const [first, second] = parsed.planning.people;
     expect(first.name).toBe('TAUZIN Caroline');
@@ -697,7 +700,10 @@ describe('parsePlanning', () => {
   });
 
   it('extracts the start date from the sheet name and filename', async () => {
-    const parsed = await parsePlanning(await buildPlanningBuffer(), 'Copie de Planning ecluse Proposition Aout 2026.xlsx');
+    const parsed = await parsePlanning(
+      await buildPlanningBuffer(),
+      'Copie de Planning ecluse Proposition Aout 2026.xlsx',
+    );
     expect(parsed.startDate).toBe('2026-07-27');
   });
 
@@ -760,8 +766,18 @@ const DAY_COLUMN_GROUPS: number[][] = [
 ];
 
 const FRENCH_MONTHS: Record<string, number> = {
-  janvier: 1, fevrier: 2, mars: 3, avril: 4, mai: 5, juin: 6,
-  juillet: 7, aout: 8, septembre: 9, octobre: 10, novembre: 11, decembre: 12,
+  janvier: 1,
+  fevrier: 2,
+  mars: 3,
+  avril: 4,
+  mai: 5,
+  juin: 6,
+  juillet: 7,
+  aout: 8,
+  septembre: 9,
+  octobre: 10,
+  novembre: 11,
+  decembre: 12,
 };
 
 export class PlanningFormatError extends Error {}
@@ -864,7 +880,9 @@ function parseDayCell(
   const rhText = texts.find((t) => RH_RE.test(t));
   if (rhText !== undefined) return { type: 'off', label: rhText };
 
-  const hasAny = raw.some((v) => v !== null && v !== undefined && (typeof v !== 'string' || v.trim() !== ''));
+  const hasAny = raw.some(
+    (v) => v !== null && v !== undefined && (typeof v !== 'string' || v.trim() !== ''),
+  );
   if (!hasAny) return { type: 'none' };
 
   const slots: Slot[] = [];
@@ -889,7 +907,10 @@ function extractStartDate(sheetName: string, fileName: string): string | null {
   const m = sheetName.match(/(\d{1,2})\s*([A-Za-zÀ-ÿ]+)/i);
   if (!m) return null;
   const day = Number(m[1]);
-  const monthKey = m[2].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const monthKey = m[2]
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
   const month = FRENCH_MONTHS[monthKey];
   if (!month || day < 1 || day > 31) return null;
   const yearMatch = fileName.match(/(20\d{2})/);
@@ -936,7 +957,11 @@ export async function parsePlanning(buffer: Buffer, fileName: string): Promise<P
   return { planning, startDate, warnings };
 }
 
-function nextBlockRow(blocks: { week: number; row: number }[], row: number, rowCount: number): number {
+function nextBlockRow(
+  blocks: { week: number; row: number }[],
+  row: number,
+  rowCount: number,
+): number {
   const next = blocks.find((b) => b.row > row);
   return next ? next.row : rowCount + 1;
 }
@@ -966,6 +991,7 @@ git commit -m "feat: add date rotation and Excel parser"
 Implement flat-file storage, the planning module (upload/get/schedule/config endpoints), and end-to-end tests.
 
 **Files:**
+
 - Create: `api/src/planning/storage.ts`
 - Create: `api/src/planning/storage.spec.ts`
 - Create: `api/src/planning/planning.module.ts`
@@ -976,6 +1002,7 @@ Implement flat-file storage, the planning module (upload/get/schedule/config end
 - Modify: `api/src/app.module.ts`
 
 **Interfaces:**
+
 - Consumes: `parsePlanning` (Task 3), `weekIndexForDate`/`weekdayIndex`/`monthDays` (Task 3), shared types.
 - Produces:
   - `PlanningModule` with `Storage` (token `'DATA_DIR'`, default `process.env.DATA_DIR ?? path.resolve(process.cwd(), 'data')`).
@@ -1027,7 +1054,10 @@ describe('Storage', () => {
 
   it('round-trips config', async () => {
     await storage.saveConfig({ startDate: '2026-07-27', defaultName: null });
-    await expect(storage.loadConfig()).resolves.toEqual({ startDate: '2026-07-27', defaultName: null });
+    await expect(storage.loadConfig()).resolves.toEqual({
+      startDate: '2026-07-27',
+      defaultName: null,
+    });
   });
 
   it('returns null when no planning JSON exists', async () => {
@@ -1142,13 +1172,20 @@ describe('PlanningController', () => {
 
   it('delegates getPlanning to the service', async () => {
     service.getPlanning.mockResolvedValue({ startDate: null, people: [], warnings: [] });
-    await expect(controller.getPlanning()).resolves.toEqual({ startDate: null, people: [], warnings: [] });
+    await expect(controller.getPlanning()).resolves.toEqual({
+      startDate: null,
+      people: [],
+      warnings: [],
+    });
     expect(service.getPlanning).toHaveBeenCalled();
   });
 
   it('delegates getSchedule to the service', async () => {
     service.getSchedule.mockResolvedValue({ month: '2026-08', days: {} });
-    await expect(controller.getSchedule('2026-08')).resolves.toEqual({ month: '2026-08', days: {} });
+    await expect(controller.getSchedule('2026-08')).resolves.toEqual({
+      month: '2026-08',
+      days: {},
+    });
     expect(service.getSchedule).toHaveBeenCalledWith('2026-08');
   });
 
@@ -1480,6 +1517,7 @@ git commit -m "feat: add planning storage, service, controller and e2e tests"
 Set up the Vite + React + TypeScript + Tailwind SPA with a working smoke test and the shared-package import.
 
 **Files:**
+
 - Create: `webapp/package.json`
 - Create: `webapp/tsconfig.json`
 - Create: `webapp/vite.config.ts`
@@ -1493,6 +1531,7 @@ Set up the Vite + React + TypeScript + Tailwind SPA with a working smoke test an
 - Create: `webapp/src/test/setup.ts`
 
 **Interfaces:**
+
 - Consumes: `@planning-espoir/shared` (dist types).
 - Produces: Vite dev server on port 5174, proxy `/api` → `http://localhost:3000`, Tailwind v4 loaded via `@tailwindcss/vite`, vitest configured with jsdom.
 
@@ -1700,6 +1739,7 @@ git commit -m "feat: scaffold Vite React webapp with Tailwind and vitest"
 Implement the Redux store with plain reducers and a custom API middleware, plus the typed API client. All tested with mocked `fetch`.
 
 **Files:**
+
 - Create: `webapp/src/store/types.ts`
 - Create: `webapp/src/store/actions.ts`
 - Create: `webapp/src/store/reducers.ts`
@@ -1711,6 +1751,7 @@ Implement the Redux store with plain reducers and a custom API middleware, plus 
 - Create: `webapp/src/colors.ts`
 
 **Interfaces:**
+
 - Consumes: `@planning-espoir/shared` types.
 - Produces:
   - `configureStore(): Store<RootState>` — `createStore(rootReducer, applyMiddleware(apiMiddleware))`.
@@ -1751,7 +1792,9 @@ describe('api client', () => {
 
   it('throws an Error with the server message on failure', async () => {
     vi.mocked(fetch).mockResolvedValue(
-      new Response(JSON.stringify({ statusCode: 404, message: 'No planning uploaded yet' }), { status: 404 }),
+      new Response(JSON.stringify({ statusCode: 404, message: 'No planning uploaded yet' }), {
+        status: 404,
+      }),
     );
     await expect(fetchPlanning()).rejects.toThrow('No planning uploaded yet');
   });
@@ -1960,7 +2003,9 @@ export function planningFetchRequested(): Action<typeof PLANNING_FETCH_REQUESTED
   return { type: PLANNING_FETCH_REQUESTED };
 }
 
-export function planningUploadRequested(file: File): Action<typeof PLANNING_UPLOAD_REQUESTED, File> {
+export function planningUploadRequested(
+  file: File,
+): Action<typeof PLANNING_UPLOAD_REQUESTED, File> {
   return { type: PLANNING_UPLOAD_REQUESTED, payload: file };
 }
 
@@ -2055,8 +2100,17 @@ function planningReducer(state: PlanningState = initialPlanning, action: Action)
       return { ...state, status: 'loading', error: null };
     case PLANNING_FETCH_SUCCESS:
     case PLANNING_UPLOAD_SUCCESS: {
-      const payload = action.payload as { people: PlanningState['people']; warnings: ParsingWarning[] };
-      return { ...state, status: 'loaded', people: payload.people, warnings: payload.warnings, error: null };
+      const payload = action.payload as {
+        people: PlanningState['people'];
+        warnings: ParsingWarning[];
+      };
+      return {
+        ...state,
+        status: 'loaded',
+        people: payload.people,
+        warnings: payload.warnings,
+        error: null,
+      };
     }
     case PLANNING_FETCH_ERROR:
     case PLANNING_UPLOAD_ERROR:
@@ -2088,7 +2142,12 @@ function configReducer(state: ConfigState = initialConfig, action: Action): Conf
       return { ...state, status: 'loading', error: null };
     case CONFIG_FETCH_SUCCESS:
     case CONFIG_UPDATE_SUCCESS:
-      return { ...state, status: 'loaded', config: action.payload as ConfigState['config'], error: null };
+      return {
+        ...state,
+        status: 'loaded',
+        config: action.payload as ConfigState['config'],
+        error: null,
+      };
     case CONFIG_FETCH_ERROR:
     case CONFIG_UPDATE_ERROR:
       return { ...state, status: 'error', error: action.error ?? 'Config update failed' };
@@ -2097,7 +2156,10 @@ function configReducer(state: ConfigState = initialConfig, action: Action): Conf
   }
 }
 
-function selectionReducer(state: SelectionState = initialSelection, action: Action): SelectionState {
+function selectionReducer(
+  state: SelectionState = initialSelection,
+  action: Action,
+): SelectionState {
   switch (action.type) {
     case SELECTION_TOGGLE: {
       const name = action.payload as string;
@@ -2198,7 +2260,9 @@ export const apiMiddleware: Middleware<object, RootState> = (store) => (next) =>
     case CONFIG_UPDATE_REQUESTED:
       store.dispatch({ type: CONFIG_UPDATE_START });
       api
-        .updateConfig(typed.payload as Partial<{ startDate: string | null; defaultName: string | null }>)
+        .updateConfig(
+          typed.payload as Partial<{ startDate: string | null; defaultName: string | null }>,
+        )
         .then((data) => {
           store.dispatch({ type: CONFIG_UPDATE_SUCCESS, payload: data });
           const month = store.getState().schedule.month;
@@ -2279,6 +2343,7 @@ git commit -m "feat: add Redux store with custom middleware and API client"
 Implement the calendar UI: month grid, day cells with per-person color, legend, person dropdown, upload button, config modal, and wire them into `App`.
 
 **Files:**
+
 - Create: `webapp/src/utils/dates.ts`
 - Create: `webapp/src/utils/dates.spec.ts`
 - Create: `webapp/src/components/Header.tsx`
@@ -2293,6 +2358,7 @@ Implement the calendar UI: month grid, day cells with per-person color, legend, 
 - Create: `webapp/src/App.test.tsx` (overwrite)
 
 **Interfaces:**
+
 - Consumes: store (`configureStore`, action creators, selectors), `colorFor`, shared types.
 - Produces:
   - `currentMonthKey(): string` — `"YYYY-MM"` for now (UTC).
@@ -2417,14 +2483,22 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
       month: '2026-08',
       days: {
         '2026-08-03': [
-          { name: 'A', colorIndex: 0, cell: { type: 'shift', slots: [{ start: '09:00', end: '13:00' }] } },
+          {
+            name: 'A',
+            colorIndex: 0,
+            cell: { type: 'shift', slots: [{ start: '09:00', end: '13:00' }] },
+          },
           { name: 'B', colorIndex: 1, cell: { type: 'off', label: 'rh' } },
         ],
       },
       error: null,
     },
     selection: { names: ['A', 'B'] },
-    config: { status: 'loaded', config: { startDate: '2026-07-27', defaultName: null }, error: null },
+    config: {
+      status: 'loaded',
+      config: { startDate: '2026-07-27', defaultName: null },
+      error: null,
+    },
     colors: { palette: ['#ff0000', '#00ff00'] },
     ...overrides,
   };
@@ -2522,12 +2596,17 @@ export function MonthCalendar() {
     <div className="overflow-x-auto">
       <div className="grid grid-cols-7 min-w-[700px]">
         {Array.from({ length: 7 }, (_, i) => (
-          <div key={i} className="border-b border-slate-200 px-2 py-1 text-center text-xs font-semibold text-slate-500">
+          <div
+            key={i}
+            className="border-b border-slate-200 px-2 py-1 text-center text-xs font-semibold text-slate-500"
+          >
             {weekdayLabel(i)}
           </div>
         ))}
         {grid.flat().map((date, idx) => {
-          const personDays = date ? (days[date] ?? []).filter((pd) => selection.includes(pd.name)) : [];
+          const personDays = date
+            ? (days[date] ?? []).filter((pd) => selection.includes(pd.name))
+            : [];
           return (
             <div
               key={idx}
@@ -2537,7 +2616,12 @@ export function MonthCalendar() {
               {date && <div className="text-xs text-slate-400">{Number(date.slice(8, 10))}</div>}
               <div className="mt-1 flex flex-col gap-0.5">
                 {personDays.map((pd) => (
-                  <DayCell key={pd.name} cell={pd.cell} colorIndex={pd.colorIndex} palette={palette} />
+                  <DayCell
+                    key={pd.name}
+                    cell={pd.cell}
+                    colorIndex={pd.colorIndex}
+                    palette={palette}
+                  />
                 ))}
               </div>
             </div>
@@ -2568,7 +2652,10 @@ export function Legend() {
     <div className="mt-4 flex flex-wrap gap-3">
       {selected.map((p) => (
         <span key={p.name} className="inline-flex items-center gap-1.5 text-sm text-slate-700">
-          <span className="inline-block h-3 w-3 rounded-full" style={{ backgroundColor: colorFor(p.colorIndex, palette) }} />
+          <span
+            className="inline-block h-3 w-3 rounded-full"
+            style={{ backgroundColor: colorFor(p.colorIndex, palette) }}
+          />
           {p.name}
         </span>
       ))}
@@ -2603,7 +2690,10 @@ export function PersonDropdown() {
       {open && (
         <div className="absolute z-10 mt-1 max-h-64 w-64 overflow-auto rounded border border-slate-200 bg-white shadow-lg">
           {people.map((p) => (
-            <label key={p.name} className="flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-slate-50">
+            <label
+              key={p.name}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-slate-50"
+            >
               <input
                 type="checkbox"
                 checked={selection.includes(p.name)}
@@ -2684,8 +2774,14 @@ export function ConfigModal({ open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/40" onClick={onClose}>
-      <div className="w-full max-w-md rounded-lg bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-20 flex items-center justify-center bg-black/40"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-lg bg-white p-5 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2 className="text-lg font-semibold text-slate-800">Configuration</h2>
         <label className="mt-4 block text-sm font-medium text-slate-600">
           Date de début
@@ -2795,7 +2891,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Header } from './components/Header';
 import { Legend } from './components/Legend';
 import { MonthCalendar } from './components/MonthCalendar';
-import { configFetchRequested, planningFetchRequested, scheduleFetchRequested } from './store/actions';
+import {
+  configFetchRequested,
+  planningFetchRequested,
+  scheduleFetchRequested,
+} from './store/actions';
 import type { RootState } from './store/types';
 import { currentMonthKey } from './utils/dates';
 
@@ -2820,7 +2920,9 @@ export default function App() {
         )}
         {planning.status === 'loading' && <p className="text-slate-500">Chargement…</p>}
         {planning.status === 'loaded' && planning.people?.length === 0 && (
-          <p className="text-slate-500">Aucun planning. Importez un fichier Excel pour commencer.</p>
+          <p className="text-slate-500">
+            Aucun planning. Importez un fichier Excel pour commencer.
+          </p>
         )}
         {planning.status === 'loaded' && planning.people && planning.people.length > 0 && (
           <>
@@ -2874,6 +2976,7 @@ git commit -m "feat: add calendar UI components and wire app"
 Containerize the API and webapp and verify the full root command set.
 
 **Files:**
+
 - Create: `.dockerignore`
 - Create: `api/Dockerfile`
 - Create: `webapp/Dockerfile`
@@ -2881,6 +2984,7 @@ Containerize the API and webapp and verify the full root command set.
 - Create: `docker-compose.yml`
 
 **Interfaces:**
+
 - Consumes: the built workspace packages.
 - Produces: `docker compose up` runs API on port 3000 and webapp (nginx) on port 8081; nginx proxies `/api` to the API.
 
@@ -2976,14 +3080,14 @@ services:
     volumes:
       - api-data:/data
     ports:
-      - "3000:3000"
+      - '3000:3000'
 
   webapp:
     build:
       context: .
       dockerfile: webapp/Dockerfile
     ports:
-      - "8081:80"
+      - '8081:80'
     depends_on:
       - api
 

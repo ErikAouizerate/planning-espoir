@@ -4,7 +4,10 @@ import { parsePlanning, PlanningFormatError } from './parser';
 
 describe('parsePlanning', () => {
   it('parses people, roles and color indexes from S1', async () => {
-    const parsed = await parsePlanning(await buildPlanningBuffer(), 'Copie de Planning ecluse Proposition Aout 2026.xlsx');
+    const parsed = await parsePlanning(
+      await buildPlanningBuffer(),
+      'Copie de Planning ecluse Proposition Aout 2026.xlsx',
+    );
     expect(parsed.planning.people).toHaveLength(2);
     const [first, second] = parsed.planning.people;
     expect(first.name).toBe('TAUZIN Caroline');
@@ -42,7 +45,10 @@ describe('parsePlanning', () => {
   });
 
   it('extracts the start date from the sheet name and filename', async () => {
-    const parsed = await parsePlanning(await buildPlanningBuffer(), 'Copie de Planning ecluse Proposition Aout 2026.xlsx');
+    const parsed = await parsePlanning(
+      await buildPlanningBuffer(),
+      'Copie de Planning ecluse Proposition Aout 2026.xlsx',
+    );
     expect(parsed.startDate).toBe('2026-07-27');
   });
 

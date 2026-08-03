@@ -24,8 +24,18 @@ const DAY_COLUMN_GROUPS: number[][] = [
 ];
 
 const FRENCH_MONTHS: Record<string, number> = {
-  janvier: 1, fevrier: 2, mars: 3, avril: 4, mai: 5, juin: 6,
-  juillet: 7, aout: 8, septembre: 9, octobre: 10, novembre: 11, decembre: 12,
+  janvier: 1,
+  fevrier: 2,
+  mars: 3,
+  avril: 4,
+  mai: 5,
+  juin: 6,
+  juillet: 7,
+  aout: 8,
+  septembre: 9,
+  octobre: 10,
+  novembre: 11,
+  decembre: 12,
 };
 
 export class PlanningFormatError extends Error {}
@@ -128,7 +138,9 @@ function parseDayCell(
   const rhText = texts.find((t) => RH_RE.test(t));
   if (rhText !== undefined) return { type: 'off', label: rhText };
 
-  const hasAny = raw.some((v) => v !== null && v !== undefined && (typeof v !== 'string' || v.trim() !== ''));
+  const hasAny = raw.some(
+    (v) => v !== null && v !== undefined && (typeof v !== 'string' || v.trim() !== ''),
+  );
   if (!hasAny) return { type: 'none' };
 
   const slots: Slot[] = [];
@@ -153,7 +165,10 @@ function extractStartDate(sheetName: string, fileName: string): string | null {
   const m = sheetName.match(/(\d{1,2})\s*([A-Za-zÀ-ÿ]+)/i);
   if (!m) return null;
   const day = Number(m[1]);
-  const monthKey = m[2].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const monthKey = m[2]
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
   const month = FRENCH_MONTHS[monthKey];
   if (!month || day < 1 || day > 31) return null;
   const yearMatch = fileName.match(/(20\d{2})/);
@@ -204,7 +219,11 @@ export async function parsePlanning(buffer: Buffer, fileName: string): Promise<P
   return { planning, startDate, warnings };
 }
 
-function nextBlockRow(blocks: { week: number; row: number }[], row: number, rowCount: number): number {
+function nextBlockRow(
+  blocks: { week: number; row: number }[],
+  row: number,
+  rowCount: number,
+): number {
   const next = blocks.find((b) => b.row > row);
   return next ? next.row : rowCount + 1;
 }

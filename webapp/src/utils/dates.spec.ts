@@ -1,4 +1,12 @@
-import { currentMonthKey, formatFullDate, mondaysInMonth, monthGrid, monthLabel, shiftMonth, weekdayLabel } from './dates';
+import {
+  currentMonthKey,
+  formatFullDate,
+  mondaysInMonth,
+  monthGrid,
+  monthLabel,
+  shiftMonth,
+  weekdayLabel,
+} from './dates';
 
 describe('dates utils', () => {
   it('shifts months across year boundaries', () => {
@@ -36,7 +44,12 @@ describe('dates utils', () => {
       '2026-08-31',
     ]);
     // February 2026: no Monday in the last week
-    expect(mondaysInMonth('2026-02')).toEqual(['2026-02-02', '2026-02-09', '2026-02-16', '2026-02-23']);
+    expect(mondaysInMonth('2026-02')).toEqual([
+      '2026-02-02',
+      '2026-02-09',
+      '2026-02-16',
+      '2026-02-23',
+    ]);
   });
 
   it('formats a month key as a French label', () => {

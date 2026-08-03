@@ -14,7 +14,9 @@ export function MonthCalendar() {
 
   return (
     <div>
-      <h2 className="font-display mb-2 text-center text-lg font-semibold text-slate-800">{monthLabel(month)}</h2>
+      <h2 className="font-display mb-2 text-center text-lg font-semibold text-slate-800">
+        {monthLabel(month)}
+      </h2>
       <div className="overflow-x-auto">
         <div className="grid grid-cols-7">
           {Array.from({ length: 7 }, (_, i) => (
@@ -26,7 +28,9 @@ export function MonthCalendar() {
             </div>
           ))}
           {grid.flat().map((date, idx) => {
-            const personDays = date ? (days[date] ?? []).filter((pd) => selection.includes(pd.name)) : [];
+            const personDays = date
+              ? (days[date] ?? []).filter((pd) => selection.includes(pd.name))
+              : [];
             const isLastCol = idx % 7 === 6;
             return (
               <div
@@ -36,10 +40,19 @@ export function MonthCalendar() {
                 }`}
                 data-testid={date ? `day-${date}` : undefined}
               >
-                {date && <div className="text-[10px] text-slate-400 sm:text-xs">{Number(date.slice(8, 10))}</div>}
+                {date && (
+                  <div className="text-[10px] text-slate-400 sm:text-xs">
+                    {Number(date.slice(8, 10))}
+                  </div>
+                )}
                 <div className="mt-0.5 flex flex-col gap-0.5 sm:mt-1">
                   {personDays.map((pd) => (
-                    <DayCell key={pd.name} cell={pd.cell} colorIndex={pd.colorIndex} palette={palette} />
+                    <DayCell
+                      key={pd.name}
+                      cell={pd.cell}
+                      colorIndex={pd.colorIndex}
+                      palette={palette}
+                    />
                   ))}
                 </div>
               </div>

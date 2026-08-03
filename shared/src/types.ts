@@ -4,9 +4,7 @@ export interface Slot {
 }
 
 export type DayCell =
-  | { type: 'shift'; slots: Slot[] }
-  | { type: 'off'; label: string }
-  | { type: 'none' };
+  { type: 'shift'; slots: Slot[] } | { type: 'off'; label: string } | { type: 'none' };
 
 export interface Person {
   name: string;

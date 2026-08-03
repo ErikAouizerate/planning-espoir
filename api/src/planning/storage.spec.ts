@@ -17,7 +17,11 @@ describe('Storage', () => {
   });
 
   it('returns null config defaults when nothing is stored', async () => {
-    await expect(storage.loadConfig()).resolves.toEqual({ startDate: null, defaultName: null, fileName: null });
+    await expect(storage.loadConfig()).resolves.toEqual({
+      startDate: null,
+      defaultName: null,
+      fileName: null,
+    });
   });
 
   it('round-trips a planning JSON', async () => {
@@ -38,7 +42,11 @@ describe('Storage', () => {
 
   it('round-trips config', async () => {
     await storage.saveConfig({ startDate: '2026-07-27', defaultName: null, fileName: null });
-    await expect(storage.loadConfig()).resolves.toEqual({ startDate: '2026-07-27', defaultName: null, fileName: null });
+    await expect(storage.loadConfig()).resolves.toEqual({
+      startDate: '2026-07-27',
+      defaultName: null,
+      fileName: null,
+    });
   });
 
   it('returns null when no planning JSON exists', async () => {

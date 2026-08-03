@@ -26,7 +26,9 @@ describe('api client', () => {
 
   it('throws an Error with the server message on failure', async () => {
     vi.mocked(fetch).mockResolvedValue(
-      new Response(JSON.stringify({ statusCode: 404, message: 'No planning uploaded yet' }), { status: 404 }),
+      new Response(JSON.stringify({ statusCode: 404, message: 'No planning uploaded yet' }), {
+        status: 404,
+      }),
     );
     await expect(fetchPlanning()).rejects.toThrow('No planning uploaded yet');
   });

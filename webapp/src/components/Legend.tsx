@@ -14,7 +14,10 @@ export function Legend() {
     <div className="mt-4 flex flex-wrap gap-3">
       {selected.map((p) => (
         <span key={p.name} className="inline-flex items-center gap-1.5 text-sm text-slate-700">
-          <span className="inline-block h-3 w-3 rounded-full" style={{ backgroundColor: colorFor(p.colorIndex, palette) }} />
+          <span
+            className="inline-block h-3 w-3 rounded-full"
+            style={{ backgroundColor: colorFor(p.colorIndex, palette) }}
+          />
           {p.name}
         </span>
       ))}

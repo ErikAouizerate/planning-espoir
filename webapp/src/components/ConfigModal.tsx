@@ -43,8 +43,14 @@ export function ConfigModal({ open, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/40" onClick={onClose}>
-      <div className="w-full max-w-md rounded-lg bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-20 flex items-center justify-center bg-black/40"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-lg bg-white p-5 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2 className="font-display text-lg font-semibold text-slate-800">Configuration</h2>
 
         <div className="mt-4">

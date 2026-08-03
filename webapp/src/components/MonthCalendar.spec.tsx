@@ -22,14 +22,22 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
       month: '2026-08',
       days: {
         '2026-08-03': [
-          { name: 'A', colorIndex: 0, cell: { type: 'shift', slots: [{ start: '09:00', end: '13:00' }] } },
+          {
+            name: 'A',
+            colorIndex: 0,
+            cell: { type: 'shift', slots: [{ start: '09:00', end: '13:00' }] },
+          },
           { name: 'B', colorIndex: 1, cell: { type: 'off', label: 'rh' } },
         ],
       },
       error: null,
     },
     selection: { names: ['A', 'B'] },
-    config: { status: 'loaded', config: { startDate: '2026-07-27', defaultName: null, fileName: null }, error: null },
+    config: {
+      status: 'loaded',
+      config: { startDate: '2026-07-27', defaultName: null, fileName: null },
+      error: null,
+    },
     colors: { palette: ['#ff0000', '#00ff00'] },
     ...overrides,
   };

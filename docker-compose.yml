@@ -8,14 +8,14 @@ services:
     volumes:
       - api-data:/data
     ports:
-      - "3000:3000"
+      - '3000:3000'
 
   webapp:
     build:
       context: .
       dockerfile: webapp/Dockerfile
     ports:
-      - "8081:80"
+      - '8081:80'
     depends_on:
       - api
 

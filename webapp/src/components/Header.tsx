@@ -28,7 +28,9 @@ export function Header() {
         >
           ‹
         </button>
-        <span className="min-w-28 text-center text-sm font-medium text-slate-700">{monthLabel(month)}</span>
+        <span className="min-w-28 text-center text-sm font-medium text-slate-700">
+          {monthLabel(month)}
+        </span>
         <button
           type="button"
           onClick={() => dispatch(scheduleFetchRequested(shiftMonth(month, 1)))}

@@ -29,20 +29,35 @@ describe('PlanningController', () => {
 
   it('delegates getPlanning to the service', async () => {
     service.getPlanning.mockResolvedValue({ startDate: null, people: [], warnings: [] });
-    await expect(controller.getPlanning()).resolves.toEqual({ startDate: null, people: [], warnings: [] });
+    await expect(controller.getPlanning()).resolves.toEqual({
+      startDate: null,
+      people: [],
+      warnings: [],
+    });
     expect(service.getPlanning).toHaveBeenCalled();
   });
 
   it('delegates getSchedule to the service', async () => {
     service.getSchedule.mockResolvedValue({ month: '2026-08', days: {} });
-    await expect(controller.getSchedule('2026-08')).resolves.toEqual({ month: '2026-08', days: {} });
+    await expect(controller.getSchedule('2026-08')).resolves.toEqual({
+      month: '2026-08',
+      days: {},
+    });
     expect(service.getSchedule).toHaveBeenCalledWith('2026-08');
   });
 
   it('delegates config get/put to the service', async () => {
     service.getConfig.mockResolvedValue({ startDate: null, defaultName: null, fileName: null });
-    await expect(controller.getConfig()).resolves.toEqual({ startDate: null, defaultName: null, fileName: null });
-    service.updateConfig.mockResolvedValue({ startDate: '2026-07-27', defaultName: null, fileName: null });
+    await expect(controller.getConfig()).resolves.toEqual({
+      startDate: null,
+      defaultName: null,
+      fileName: null,
+    });
+    service.updateConfig.mockResolvedValue({
+      startDate: '2026-07-27',
+      defaultName: null,
+      fileName: null,
+    });
     await expect(controller.updateConfig({ startDate: '2026-07-27' })).resolves.toEqual({
       startDate: '2026-07-27',
       defaultName: null,

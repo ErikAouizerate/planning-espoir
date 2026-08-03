@@ -11,7 +11,7 @@ export async function buildPlanningBuffer(): Promise<Buffer> {
 
   ws.getCell(2, 6).value = 'PLANNING ACCUEIL URGENCE ECLUSE';
   ws.getCell(4, 1).value = 'S1';
-  dayNames.forEach((name, i) => ws.getCell(4, 2 + i * 4).value = name);
+  dayNames.forEach((name, i) => (ws.getCell(4, 2 + i * 4).value = name));
   ws.getCell(4, 30).value = 'TOTAL';
 
   // S1: person rows 6 and 8, role rows 7 and 9
@@ -27,7 +27,7 @@ export async function buildPlanningBuffer(): Promise<Buffer> {
 
   // S2: same people, different Monday times for person 0
   ws.getCell(11, 1).value = 'S2';
-  dayNames.forEach((name, i) => ws.getCell(11, 2 + i * 4).value = name);
+  dayNames.forEach((name, i) => (ws.getCell(11, 2 + i * 4).value = name));
   ws.getCell(13, 1).value = people[0];
   ws.getCell(13, 2).value = time(8, 30);
   ws.getCell(13, 3).value = time(12, 0);
@@ -39,7 +39,7 @@ export async function buildPlanningBuffer(): Promise<Buffer> {
   for (let w = 3; w <= 6; w++) {
     const headerRow = 18 + (w - 3) * 5;
     ws.getCell(headerRow, 1).value = `S${w}`;
-    dayNames.forEach((name, i) => ws.getCell(headerRow, 2 + i * 4).value = name);
+    dayNames.forEach((name, i) => (ws.getCell(headerRow, 2 + i * 4).value = name));
     ws.getCell(headerRow + 2, 1).value = people[0];
     ws.getCell(headerRow + 3, 1).value = roles[0];
     ws.getCell(headerRow + 4, 1).value = people[1];

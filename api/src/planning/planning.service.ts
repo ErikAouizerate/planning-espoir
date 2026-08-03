@@ -6,7 +6,13 @@ import type {
   ParsingWarning,
   ScheduleMonth,
 } from '@planning-espoir/shared';
-import { monthDays, isValidMonth, isValidDateKey, weekIndexForDate, weekdayIndex } from './date-rotation';
+import {
+  monthDays,
+  isValidMonth,
+  isValidDateKey,
+  weekIndexForDate,
+  weekdayIndex,
+} from './date-rotation';
 import { parsePlanning, PlanningFormatError } from './parser';
 import { Storage } from './storage';
 

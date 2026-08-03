@@ -25,7 +25,11 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
       error: null,
     },
     selection: { names: [] },
-    config: { status: 'loaded', config: { startDate: '2026-07-27', defaultName: null, fileName: null }, error: null },
+    config: {
+      status: 'loaded',
+      config: { startDate: '2026-07-27', defaultName: null, fileName: null },
+      error: null,
+    },
     colors: { palette: ['#ff0000'] },
     ...overrides,
   };
@@ -39,7 +43,9 @@ describe('ConfigModal', () => {
         <ConfigModal open onClose={() => {}} />
       </Provider>,
     );
-    expect(screen.getByText('La semaine 1 correspond à la semaine du lundi 27 juillet 2026')).toBeInTheDocument();
+    expect(
+      screen.getByText('La semaine 1 correspond à la semaine du lundi 27 juillet 2026'),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /lundi 27 juillet/i })).toBeInTheDocument();
   });
 
@@ -89,6 +95,8 @@ describe('ConfigModal', () => {
 
     await user.click(screen.getByRole('button', { name: 'Mois suivant' }));
     await user.click(screen.getByRole('button', { name: /lundi 10 août/i }));
-    expect(screen.getByText('La semaine 1 correspond à la semaine du lundi 10 août 2026')).toBeInTheDocument();
+    expect(
+      screen.getByText('La semaine 1 correspond à la semaine du lundi 10 août 2026'),
+    ).toBeInTheDocument();
   });
 });
