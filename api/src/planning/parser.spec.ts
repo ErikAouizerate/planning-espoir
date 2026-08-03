@@ -10,10 +10,10 @@ describe('parsePlanning', () => {
     );
     expect(parsed.planning.people).toHaveLength(2);
     const [first, second] = parsed.planning.people;
-    expect(first.name).toBe('TAUZIN Caroline');
+    expect(first.name).toBe('BOB Dylan');
     expect(first.role).toBe('ES -1 ETP');
     expect(first.colorIndex).toBe(0);
-    expect(second.name).toBe('Céline PREAU');
+    expect(second.name).toBe('Jacques BREL');
     expect(second.colorIndex).toBe(1);
   });
 

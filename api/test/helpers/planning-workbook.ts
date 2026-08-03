@@ -6,7 +6,7 @@ export async function buildPlanningBuffer(): Promise<Buffer> {
   const time = (h: number, m: number): Date => new Date(Date.UTC(1899, 11, 30, h, m));
   const dayNames = ['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI', 'DIMANCHE'];
 
-  const people = ['TAUZIN Caroline', 'Céline PREAU'];
+  const people = ['BOB Dylan', 'Jacques BREL'];
   const roles = ['ES -1 ETP', 'TISF 1 ETP /36'];
 
   ws.getCell(2, 6).value = 'PLANNING ACCUEIL URGENCE ECLUSE';
