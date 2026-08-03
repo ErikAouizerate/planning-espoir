@@ -1,0 +1,23 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    environment:
+      - DATA_DIR=/data
+    volumes:
+      - api-data:/data
+    ports:
+      - "3000:3000"
+
+  webapp:
+    build:
+      context: .
+      dockerfile: webapp/Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  api-data:
