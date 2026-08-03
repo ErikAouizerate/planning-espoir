@@ -33,3 +33,40 @@ export function monthGrid(month: string): (string | null)[][] {
 export function weekdayLabel(index: number): string {
   return WEEKDAY_LABELS[index];
 }
+
+export function monthDays(month: string): string[] {
+  const [year, monthIndex] = month.split('-').map(Number);
+  const daysInMonth = new Date(Date.UTC(year, monthIndex, 0)).getUTCDate();
+  const days: string[] = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    days.push(`${month}-${String(d).padStart(2, '0')}`);
+  }
+  return days;
+}
+
+export function mondaysInMonth(month: string): string[] {
+  return monthDays(month).filter((date) => weekdayIndex(date) === 0);
+}
+
+function weekdayIndex(date: string): number {
+  const d = new Date(`${date}T00:00:00Z`);
+  return (d.getUTCDay() + 6) % 7;
+}
+
+const MONTH_LABELS = [
+  'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
+];
+
+export function monthLabel(month: string): string {
+  const [, monthIndex] = month.split('-').map(Number);
+  return `${MONTH_LABELS[monthIndex - 1]} ${month.slice(0, 4)}`;
+}
+
+const WEEKDAY_FULL = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+
+export function formatFullDate(date: string): string {
+  const [year, monthIndex, day] = date.split('-').map(Number);
+  const weekday = weekdayIndex(date);
+  return `${WEEKDAY_FULL[weekday]} ${day} ${MONTH_LABELS[monthIndex - 1]} ${year}`;
+}

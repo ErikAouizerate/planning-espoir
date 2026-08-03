@@ -1,4 +1,4 @@
-import { currentMonthKey, monthGrid, shiftMonth, weekdayLabel } from './dates';
+import { currentMonthKey, formatFullDate, mondaysInMonth, monthGrid, monthLabel, shiftMonth, weekdayLabel } from './dates';
 
 describe('dates utils', () => {
   it('shifts months across year boundaries', () => {
@@ -24,5 +24,27 @@ describe('dates utils', () => {
   it('labels weekdays', () => {
     expect(weekdayLabel(0)).toBe('Lun');
     expect(weekdayLabel(6)).toBe('Dim');
+  });
+
+  it('lists the Mondays of a month', () => {
+    // August 2026: Mondays are the 3rd, 10th, 17th, 24th, 31st
+    expect(mondaysInMonth('2026-08')).toEqual([
+      '2026-08-03',
+      '2026-08-10',
+      '2026-08-17',
+      '2026-08-24',
+      '2026-08-31',
+    ]);
+    // February 2026: no Monday in the last week
+    expect(mondaysInMonth('2026-02')).toEqual(['2026-02-02', '2026-02-09', '2026-02-16', '2026-02-23']);
+  });
+
+  it('formats a month key as a French label', () => {
+    expect(monthLabel('2026-08')).toBe('août 2026');
+    expect(monthLabel('2026-01')).toBe('janvier 2026');
+  });
+
+  it('formats a date key as a full French date', () => {
+    expect(formatFullDate('2026-07-27')).toBe('lundi 27 juillet 2026');
   });
 });

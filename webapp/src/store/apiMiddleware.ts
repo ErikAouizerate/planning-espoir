@@ -42,6 +42,7 @@ export const apiMiddleware: Middleware<object, RootState> = (store) => (next) =>
         .uploadPlanning(typed.payload as File)
         .then((data) => {
           store.dispatch({ type: PLANNING_UPLOAD_SUCCESS, payload: data });
+          store.dispatch({ type: CONFIG_FETCH_REQUESTED });
           const month = store.getState().schedule.month;
           if (month) store.dispatch({ type: SCHEDULE_FETCH_REQUESTED, payload: month });
         })
