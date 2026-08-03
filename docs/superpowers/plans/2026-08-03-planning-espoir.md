@@ -2882,7 +2882,7 @@ Containerize the API and webapp and verify the full root command set.
 
 **Interfaces:**
 - Consumes: the built workspace packages.
-- Produces: `docker compose up` runs API on port 3000 and webapp (nginx) on port 8080; nginx proxies `/api` to the API.
+- Produces: `docker compose up` runs API on port 3000 and webapp (nginx) on port 8081; nginx proxies `/api` to the API.
 
 - [ ] **Step 1: Create `.dockerignore`**
 
@@ -2983,7 +2983,7 @@ services:
       context: .
       dockerfile: webapp/Dockerfile
     ports:
-      - "8080:80"
+      - "8081:80"
     depends_on:
       - api
 

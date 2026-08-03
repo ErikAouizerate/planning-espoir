@@ -44,3 +44,6 @@ Run from the repo root (yarn workspaces):
 ## Decision history
 
 The user wants a reviewable trace of the LLM-driven creation process. Design decisions live in `docs/adr/`, implementation plans in `docs/superpowers/plans/`. `docs/` and `AGENTS.md` are committed alongside the code they document; update them whenever architecture or scope changes.
+
+Le fichier IMPROVEMENTS.md contient la liste des amélioration à effectué
+le fichier MANUAL_EDITS.md contient la liste ds modification que j'ai effectué
