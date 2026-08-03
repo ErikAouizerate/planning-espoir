@@ -10,7 +10,7 @@ const middlewares: Middleware<object, RootState>[] = [apiMiddleware];
 if (import.meta.env.MODE === 'development') {
   middlewares.push(
     createLogger({
-      collapsed: false,
+      collapsed: true,
     }) as Middleware<object, RootState>,
   );
 }
