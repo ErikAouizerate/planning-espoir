@@ -7,3 +7,5 @@ tu peux regrouper les remarque qui vont ensemble ou qu'il est pertinant de trait
 une fois traité, tu dois supprimer la remarque correspondante
 
 ## todo
+
+- ajoute la config prettier et lint tous les fichier avec

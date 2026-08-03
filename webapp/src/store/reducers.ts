@@ -1,6 +1,6 @@
-import { combineReducers } from 'redux';
-import type { PersonDay, ParsingWarning } from '@planning-espoir/shared';
-import type { Action } from './actions';
+import { combineReducers } from "redux";
+import type { PersonDay, ParsingWarning } from "@planning-espoir/shared";
+import type { Action } from "./actions";
 import {
   CONFIG_FETCH_ERROR,
   CONFIG_FETCH_START,
@@ -19,32 +19,32 @@ import {
   SCHEDULE_FETCH_SUCCESS,
   SELECTION_CLEAR,
   SELECTION_TOGGLE,
-} from './actions';
-import { PALETTE } from '../colors';
+} from "./actions";
+import { PALETTE } from "../colors";
 import type {
   ColorsState,
   ConfigState,
   PlanningState,
   ScheduleState,
   SelectionState,
-} from './types';
+} from "./types";
 
 const initialPlanning: PlanningState = {
-  status: 'idle',
+  status: "idle",
   people: null,
   warnings: [],
   error: null,
 };
 
 const initialSchedule: ScheduleState = {
-  status: 'idle',
-  month: '',
+  status: "idle",
+  month: "",
   days: null,
   error: null,
 };
 
 const initialConfig: ConfigState = {
-  status: 'idle',
+  status: "idle",
   config: { startDate: null, defaultName: null, fileName: null },
   error: null,
 };
@@ -53,56 +53,108 @@ const initialSelection: SelectionState = { names: [] };
 
 const initialColors: ColorsState = { palette: PALETTE };
 
-function planningReducer(state: PlanningState = initialPlanning, action: Action): PlanningState {
+function planningReducer(
+  state: PlanningState = initialPlanning,
+  action: Action,
+): PlanningState {
   switch (action.type) {
     case PLANNING_FETCH_START:
     case PLANNING_UPLOAD_START:
-      return { ...state, status: 'loading', error: null };
+      return { ...state, status: "loading", error: null };
     case PLANNING_FETCH_SUCCESS:
     case PLANNING_UPLOAD_SUCCESS: {
-      const payload = action.payload as { people: PlanningState['people']; warnings: ParsingWarning[] };
-      return { ...state, status: 'loaded', people: payload.people, warnings: payload.warnings, error: null };
+      const payload = action.payload as {
+        people: PlanningState["people"];
+        warnings: ParsingWarning[];
+      };
+      return {
+        ...state,
+        status: "loaded",
+        people: payload.people,
+        warnings: payload.warnings,
+        error: null,
+      };
     }
     case PLANNING_FETCH_ERROR:
     case PLANNING_UPLOAD_ERROR:
-      return { ...state, status: 'error', error: action.error ?? 'Upload failed' };
+      return {
+        ...state,
+        status: "error",
+        error: action.error ?? "Upload failed",
+      };
     default:
       return state;
   }
 }
 
-function scheduleReducer(state: ScheduleState = initialSchedule, action: Action): ScheduleState {
+function scheduleReducer(
+  state: ScheduleState = initialSchedule,
+  action: Action,
+): ScheduleState {
   switch (action.type) {
     case SCHEDULE_FETCH_START:
-      return { ...state, status: 'loading', month: action.payload as string, error: null };
+      return {
+        ...state,
+        status: "loading",
+        month: action.payload as string,
+        error: null,
+      };
     case SCHEDULE_FETCH_SUCCESS: {
-      const payload = action.payload as { month: string; days: Record<string, PersonDay[]> };
-      return { ...state, status: 'loaded', month: payload.month, days: payload.days, error: null };
+      const payload = action.payload as {
+        month: string;
+        days: Record<string, PersonDay[]>;
+      };
+      return {
+        ...state,
+        status: "loaded",
+        month: payload.month,
+        days: payload.days,
+        error: null,
+      };
     }
     case SCHEDULE_FETCH_ERROR:
-      return { ...state, status: 'error', error: action.error ?? 'Schedule fetch failed' };
+      return {
+        ...state,
+        status: "error",
+        error: action.error ?? "Schedule fetch failed",
+      };
     default:
       return state;
   }
 }
 
-function configReducer(state: ConfigState = initialConfig, action: Action): ConfigState {
+function configReducer(
+  state: ConfigState = initialConfig,
+  action: Action,
+): ConfigState {
   switch (action.type) {
     case CONFIG_FETCH_START:
     case CONFIG_UPDATE_START:
-      return { ...state, status: 'loading', error: null };
+      return { ...state, status: "loading", error: null };
     case CONFIG_FETCH_SUCCESS:
     case CONFIG_UPDATE_SUCCESS:
-      return { ...state, status: 'loaded', config: action.payload as ConfigState['config'], error: null };
+      return {
+        ...state,
+        status: "loaded",
+        config: action.payload as ConfigState["config"],
+        error: null,
+      };
     case CONFIG_FETCH_ERROR:
     case CONFIG_UPDATE_ERROR:
-      return { ...state, status: 'error', error: action.error ?? 'Config update failed' };
+      return {
+        ...state,
+        status: "error",
+        error: action.error ?? "Config update failed",
+      };
     default:
       return state;
   }
 }
 
-function selectionReducer(state: SelectionState = initialSelection, action: Action): SelectionState {
+function selectionReducer(
+  state: SelectionState = initialSelection,
+  action: Action,
+): SelectionState {
   switch (action.type) {
     case SELECTION_TOGGLE: {
       const name = action.payload as string;
