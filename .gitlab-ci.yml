@@ -1,11 +1,12 @@
 stages:
-  - lint
+  - prepare
   - build
+  - test
   - deploy
 
 image: node:22-alpine
 
-cache:
+cache: &cache
   key: ${CI_COMMIT_REF_SLUG}
   paths:
     - node_modules/
@@ -13,23 +14,49 @@ cache:
     - api/dist/
     - webapp/dist/
 
-before_script:
-  - yarn install --frozen-lockfile
+install:
+  stage: prepare
+  script:
+    - yarn install --frozen-lockfile
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1h
+  cache:
+    <<: *cache
+    policy: pull-push
 
 lint:
-  stage: lint
+  stage: prepare
   script:
+    - yarn install --frozen-lockfile
     - yarn lint
+  cache:
+    <<: *cache
+    policy: pull-push
 
 build:
   stage: build
+  needs: [install]
   script:
     - yarn build
+  cache:
+    <<: *cache
+    policy: pull-push
+
+test:
+  stage: test
+  needs: [build]
+  script:
     - yarn test
+  cache:
+    <<: *cache
+    policy: pull
 
 deploy:
   stage: deploy
   image: curlimages/curl
+  needs: [test]
   variables:
     GIT_STRATEGY: none
   script:
