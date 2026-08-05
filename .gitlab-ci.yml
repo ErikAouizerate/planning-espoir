@@ -28,16 +28,16 @@ install:
 
 lint:
   stage: prepare
+  needs: [install]
   script:
-    - yarn install --frozen-lockfile
     - yarn lint
   cache:
     <<: *cache
-    policy: pull-push
+    policy: pull
 
 build:
   stage: build
-  needs: [install]
+  needs: [lint]
   script:
     - yarn build
   cache:
