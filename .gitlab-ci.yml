@@ -27,7 +27,7 @@ install:
     policy: pull-push
 
 lint:
-  stage: prepare
+  stage: build
   needs: [install]
   script:
     - yarn lint
@@ -37,7 +37,7 @@ lint:
 
 build:
   stage: build
-  needs: [lint]
+  needs: [install]
   script:
     - yarn build
   cache:
@@ -46,7 +46,7 @@ build:
 
 test:
   stage: test
-  needs: [build]
+  needs: [lint, build]
   script:
     - yarn test
   cache:
