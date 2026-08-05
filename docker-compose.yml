@@ -3,21 +3,37 @@ services:
     build:
       context: .
       dockerfile: api/Dockerfile
+    env_file: .env
     environment:
       - DATA_DIR=/data
     volumes:
       - api-data:/data
-    ports:
-      - '3000:3000'
+    networks:
+      - planning-net
+    restart: unless-stopped
 
   webapp:
     build:
       context: .
       dockerfile: webapp/Dockerfile
+      args:
+        VITE_AUTH_ENABLED: ${VITE_AUTH_ENABLED}
+        VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL}
+        VITE_KEYCLOAK_REALM: ${VITE_KEYCLOAK_REALM}
+        VITE_KEYCLOAK_CLIENT_ID: ${VITE_KEYCLOAK_CLIENT_ID}
+        VITE_GATEWAY_URL: ${VITE_GATEWAY_URL}
+        VITE_APP_GROUP: ${VITE_APP_GROUP}
     ports:
-      - '8081:80'
+      - '80:80'
     depends_on:
       - api
+    networks:
+      - planning-net
+    restart: unless-stopped
 
 volumes:
   api-data:
+
+networks:
+  planning-net:
+    driver: bridge

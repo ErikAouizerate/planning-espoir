@@ -7,7 +7,11 @@ import { AuthGuard } from './auth/auth.guard';
 import { PlanningModule } from './planning/planning.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), PlanningModule, AuthModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '../.env' }),
+    PlanningModule,
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [{ provide: APP_GUARD, useExisting: AuthGuard }],
 })
