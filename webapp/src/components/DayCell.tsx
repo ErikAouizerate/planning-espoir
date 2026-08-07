@@ -13,7 +13,7 @@ export function DayCell({ cell, colorIndex, palette }: Props) {
   if (cell.type === 'off') {
     return (
       <span
-        className="inline-block max-w-full truncate rounded px-1 py-0.5 text-[9px] font-medium text-white sm:px-1.5 sm:text-xs"
+        className="inline-block rounded px-1 py-0.5 text-[9px] font-medium text-white sm:px-1.5 sm:text-xs"
         style={{ backgroundColor: color }}
         title={cell.label}
       >
@@ -26,7 +26,7 @@ export function DayCell({ cell, colorIndex, palette }: Props) {
       {cell.slots.map((slot, i) => (
         <span
           key={i}
-          className="inline-block max-w-full truncate rounded px-1 py-0.5 text-[9px] font-medium text-white sm:px-1.5 sm:text-xs"
+          className="inline-block rounded px-1 py-0.5 text-[9px] font-medium text-white sm:px-1.5 sm:text-xs"
           style={{ backgroundColor: color }}
         >
           {slot.start}–{slot.end}

@@ -57,7 +57,7 @@ export function MonthCalendar() {
             return (
               <div
                 key={idx}
-                className={`min-h-16 border-b p-0.5 sm:min-h-24 sm:p-1 ${
+                className={`min-h-20 border-b p-0.5 sm:min-h-24 sm:p-1 ${
                   isToday ? 'bg-blue-200' : ''
                 } ${isLastCol ? 'border-slate-200' : 'border-r border-b border-slate-200'}`}
                 data-testid={date ? `day-${date}` : undefined}
