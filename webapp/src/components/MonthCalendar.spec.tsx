@@ -75,6 +75,17 @@ describe('MonthCalendar', () => {
     expect(screen.getByRole('heading', { name: 'août 2026' })).toBeInTheDocument();
   });
 
+  it('renders previous and next month navigation buttons', () => {
+    const store = createTestStore(makeState());
+    render(
+      <Provider store={store}>
+        <MonthCalendar />
+      </Provider>,
+    );
+    expect(screen.getByRole('button', { name: 'Mois précédent' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Mois suivant' })).toBeInTheDocument();
+  });
+
   it('highlights the current day cell with a distinct background', () => {
     const today = todayKey();
     const [year, month] = today.split('-');

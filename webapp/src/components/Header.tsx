@@ -1,16 +1,12 @@
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { keycloak } from '../auth/keycloak';
-import { scheduleFetchRequested } from '../store/actions';
 import type { RootState } from '../store/types';
-import { monthLabel, shiftMonth } from '../utils/dates';
 import { ConfigModal } from './ConfigModal';
 import { PersonDropdown } from './PersonDropdown';
 import { UploadButton } from './UploadButton';
 
 export function Header() {
-  const dispatch = useDispatch();
-  const month = useSelector((state: RootState) => state.schedule.month);
   const fileName = useSelector((state: RootState) => state.config.config.fileName);
   const username = useSelector((state: RootState) => state.auth.username);
   const authEnabled = keycloak.isEnabled();
@@ -24,25 +20,6 @@ export function Header() {
           {fileName && <p className="text-xs text-slate-400">{fileName}</p>}
         </div>
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <button
-            type="button"
-            onClick={() => dispatch(scheduleFetchRequested(shiftMonth(month, -1)))}
-            className="rounded border border-slate-300 px-2 py-1 text-sm"
-            aria-label="Mois précédent"
-          >
-            ‹
-          </button>
-          <span className="min-w-28 text-center text-sm font-medium text-slate-700">
-            {monthLabel(month)}
-          </span>
-          <button
-            type="button"
-            onClick={() => dispatch(scheduleFetchRequested(shiftMonth(month, 1)))}
-            className="rounded border border-slate-300 px-2 py-1 text-sm"
-            aria-label="Mois suivant"
-          >
-            ›
-          </button>
           <PersonDropdown />
           <UploadButton />
           <button

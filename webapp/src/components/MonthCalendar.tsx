@@ -1,9 +1,11 @@
-import { useSelector } from 'react-redux';
-import { monthGrid, monthLabel, todayKey, weekdayLabel } from '../utils/dates';
+import { useDispatch, useSelector } from 'react-redux';
+import { monthGrid, monthLabel, shiftMonth, todayKey, weekdayLabel } from '../utils/dates';
+import { scheduleFetchRequested } from '../store/actions';
 import type { RootState } from '../store/types';
 import { DayCell } from './DayCell';
 
 export function MonthCalendar() {
+  const dispatch = useDispatch();
   const month = useSelector((state: RootState) => state.schedule.month);
   const days = useSelector((state: RootState) => state.schedule.days);
   const selection = useSelector((state: RootState) => state.selection.names);
@@ -15,9 +17,27 @@ export function MonthCalendar() {
 
   return (
     <div>
-      <h2 className="font-display mb-2 text-center text-lg font-semibold text-slate-800">
-        {monthLabel(month)}
-      </h2>
+      <div className="mb-2 flex items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={() => dispatch(scheduleFetchRequested(shiftMonth(month, -1)))}
+          className="rounded border border-slate-300 px-2 py-1 text-sm"
+          aria-label="Mois précédent"
+        >
+          ‹
+        </button>
+        <h2 className="font-display text-center text-lg font-semibold text-slate-800">
+          {monthLabel(month)}
+        </h2>
+        <button
+          type="button"
+          onClick={() => dispatch(scheduleFetchRequested(shiftMonth(month, 1)))}
+          className="rounded border border-slate-300 px-2 py-1 text-sm"
+          aria-label="Mois suivant"
+        >
+          ›
+        </button>
+      </div>
       <div className="overflow-x-auto">
         <div className="grid grid-cols-7">
           {Array.from({ length: 7 }, (_, i) => (

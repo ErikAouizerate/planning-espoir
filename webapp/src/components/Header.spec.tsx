@@ -38,15 +38,6 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
 }
 
 describe('Header', () => {
-  it('shows the displayed month as a French label', () => {
-    render(
-      <Provider store={createTestStore(makeState())}>
-        <Header />
-      </Provider>,
-    );
-    expect(screen.getByText('août 2026')).toBeInTheDocument();
-  });
-
   it('shows the uploaded file name', () => {
     render(
       <Provider store={createTestStore(makeState())}>
