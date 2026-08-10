@@ -9,7 +9,7 @@ Communication with the user is in French; all code, documentation, and tests in 
 Yarn workspaces monorepo, three packages:
 
 - `shared/` — `@planning-espoir/shared`, domain types only. Consumed from `dist/` (`main: dist/index.js`), so **rebuild it after any edit** (`yarn workspace @planning-espoir/shared build`) or api/webapp typecheck and tests will use stale types. All root scripts build it first.
-- `api/` — `@planning-espoir/api`, NestJS. Global prefix `/api`, port 3000. No database: flat files under `DATA_DIR` (default `<cwd>/data`, i.e. `api/data/` in dev — gitignored, real local data lives there). One planning at a time: `planning.xlsx` (raw), `planning.json` (normalized), `config.json` (`startDate`, `defaultName`, `fileName`).
+- `api/` — `@planning-espoir/api`, NestJS. Global prefix `/api`, port 3000. No database: flat files under `DATA_DIR` (default `<cwd>/data`, i.e. `api/data/` in dev — gitignored, real local data lives there). One planning at a time: `planning.xlsx` (raw), `planning.json` (normalized), `config.json` (`startDate`, `defaultNames`, `fileName`).
 - `webapp/` — `@planning-espoir/webapp`, React 19 + Vite SPA, port 5174, proxies `/api` → `localhost:3000`.
 
 ## Commands (from repo root)

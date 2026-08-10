@@ -570,7 +570,7 @@ export function PersonDropdown() {
       selected={defaultNames}
       onToggle={(name) =>
         setDefaultNames((prev) =>
-          prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+          prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
         )
       }
     />
@@ -656,12 +656,14 @@ const sundayWeeks = useSelector((state: RootState) => state.schedule.sundayWeeks
 Replace the day-number block with:
 
 ```tsx
-{date && (
-  <div className="flex items-baseline justify-between text-[10px] text-slate-400 sm:text-xs">
-    <span>{Number(date.slice(8, 10))}</span>
-    {sundayWeeks?.[date] !== undefined && <span>S{sundayWeeks[date]}</span>}
-  </div>
-)}
+{
+  date && (
+    <div className="flex items-baseline justify-between text-[10px] text-slate-400 sm:text-xs">
+      <span>{Number(date.slice(8, 10))}</span>
+      {sundayWeeks?.[date] !== undefined && <span>S{sundayWeeks[date]}</span>}
+    </div>
+  );
+}
 ```
 
 - [ ] **Step 4: Run the webapp tests and typecheck**
@@ -699,4 +701,3 @@ Expected: all PASS. If lint fails on formatting, run `yarn format` and re-run.
 git add AGENTS.md
 git commit -m "docs: defaultNames in AGENTS.md config.json field list"
 ```
-

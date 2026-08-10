@@ -104,7 +104,7 @@ export function ConfigModal({ open, onClose }: Props) {
               selected={defaultNames}
               onToggle={(name) =>
                 setDefaultNames((prev) =>
-                  prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+                  prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
                 )
               }
             />
