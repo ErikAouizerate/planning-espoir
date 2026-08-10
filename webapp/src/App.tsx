@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Header } from './components/Header';
 import { Legend } from './components/Legend';
 import { MonthCalendar } from './components/MonthCalendar';
+import { PWAUpdatePrompt } from './components/PWAUpdatePrompt';
 import {
   authFetchRequested,
   configFetchRequested,
@@ -73,6 +74,7 @@ export default function App() {
           </>
         )}
       </main>
+      <PWAUpdatePrompt />
     </div>
   );
 }
