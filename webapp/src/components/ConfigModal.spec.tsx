@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { describe, expect, it } from 'vitest';
@@ -21,12 +21,13 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
       status: 'loaded',
       month: '2026-08',
       days: {},
+      sundayWeeks: null,
       error: null,
     },
     selection: { names: [] },
     config: {
       status: 'loaded',
-      config: { startDate: '2026-07-27', defaultName: null, fileName: null },
+      config: { startDate: '2026-07-27', defaultNames: [], fileName: null },
       error: null,
     },
     colors: { palette: ['#ff0000'] },
@@ -49,7 +50,7 @@ describe('ConfigModal', () => {
     expect(screen.getByRole('button', { name: /lundi 27 juillet/i })).toBeInTheDocument();
   });
 
-  it('proposes the people list in the default name dropdown', async () => {
+  it('proposes the people list in the default names multi-select', async () => {
     const user = userEvent.setup();
     const store = createTestStore(makeState());
     render(
@@ -58,12 +59,15 @@ describe('ConfigModal', () => {
       </Provider>,
     );
 
-    const dropdown = screen.getByRole('button', { name: /nom par défaut/i });
-    await user.click(dropdown);
+    expect(screen.getByText('Noms par défaut')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Personnes (0)' }));
 
-    const listbox = await screen.findByRole('listbox');
-    expect(within(listbox).getByText('TAUZIN Caroline')).toBeInTheDocument();
-    expect(within(listbox).getByText('Nathalie Simakha')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: 'TAUZIN Caroline' })).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: 'Nathalie Simakha' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('checkbox', { name: 'TAUZIN Caroline' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Nathalie Simakha' }));
+    expect(screen.getByRole('button', { name: 'Personnes (2)' })).toBeInTheDocument();
   });
 
   it('navigates months and lists the Mondays of the displayed month', async () => {

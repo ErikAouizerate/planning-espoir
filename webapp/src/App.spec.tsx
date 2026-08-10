@@ -17,12 +17,13 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
       status: 'loaded',
       month: '2026-08',
       days: {},
+      sundayWeeks: null,
       error: null,
     },
     selection: { names: [] },
     config: {
       status: 'loaded',
-      config: { startDate: null, defaultName: null, fileName: null },
+      config: { startDate: null, defaultNames: [], fileName: null },
       error: null,
     },
     colors: { palette: ['#ff0000'] },
@@ -53,7 +54,13 @@ describe('App', () => {
   it('renders the schedule error banner when the schedule fetch failed', () => {
     const store = createTestStore(
       makeState({
-        schedule: { status: 'error', month: '', days: null, error: 'Schedule fetch failed' },
+        schedule: {
+          status: 'error',
+          month: '',
+          days: null,
+          sundayWeeks: null,
+          error: 'Schedule fetch failed',
+        },
       }),
     );
     render(
@@ -69,7 +76,7 @@ describe('App', () => {
       makeState({
         config: {
           status: 'error',
-          config: { startDate: null, defaultName: null, fileName: null },
+          config: { startDate: null, defaultNames: [], fileName: null },
           error: 'Config fetch failed',
         },
       }),

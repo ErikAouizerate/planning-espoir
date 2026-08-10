@@ -30,12 +30,13 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
           { name: 'B', colorIndex: 1, cell: { type: 'off', label: 'rh' } },
         ],
       },
+      sundayWeeks: null,
       error: null,
     },
     selection: { names: ['A', 'B'] },
     config: {
       status: 'loaded',
-      config: { startDate: '2026-07-27', defaultName: null, fileName: null },
+      config: { startDate: '2026-07-27', defaultNames: [], fileName: null },
       error: null,
     },
     colors: { palette: ['#ff0000', '#00ff00'] },
@@ -93,7 +94,13 @@ describe('MonthCalendar', () => {
       <Provider
         store={createTestStore(
           makeState({
-            schedule: { status: 'loaded', month: `${year}-${month}`, days: {}, error: null },
+            schedule: {
+              status: 'loaded',
+              month: `${year}-${month}`,
+              days: {},
+              sundayWeeks: null,
+              error: null,
+            },
           }),
         )}
       >

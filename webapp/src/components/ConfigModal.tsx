@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useClickOutside } from '../hooks/useClickOutside';
 import { configUpdateRequested } from '../store/actions';
 import type { RootState } from '../store/types';
 import { formatFullDate, mondaysInMonth, monthLabel, shiftMonth } from '../utils/dates';
+import { PersonMultiSelect } from './PersonMultiSelect';
 
 interface Props {
   open: boolean;
@@ -16,20 +16,15 @@ export function ConfigModal({ open, onClose }: Props) {
   const people = useSelector((state: RootState) => state.planning.people) ?? [];
 
   const [startDate, setStartDate] = useState<string | null>(null);
-  const [defaultName, setDefaultName] = useState('');
+  const [defaultNames, setDefaultNames] = useState<string[]>([]);
   const [month, setMonth] = useState('');
-  const [nameOpen, setNameOpen] = useState(false);
-  const nameRef = useRef<HTMLDivElement>(null);
-
-  useClickOutside(nameRef, () => setNameOpen(false));
 
   useEffect(() => {
     if (open) {
       setStartDate(config.startDate);
-      setDefaultName(config.defaultName ?? '');
+      setDefaultNames([...config.defaultNames]);
       const initial = config.startDate?.slice(0, 7) ?? new Date().toISOString().slice(0, 7);
       setMonth(initial);
-      setNameOpen(false);
     }
   }, [open, config]);
 
@@ -101,53 +96,20 @@ export function ConfigModal({ open, onClose }: Props) {
           </div>
         </div>
 
-        <label className="mt-4 block text-sm font-medium text-slate-600">
-          Nom par défaut
-          <div className="relative mt-1" ref={nameRef}>
-            <button
-              type="button"
-              onClick={() => setNameOpen((v) => !v)}
-              className="w-full rounded border border-slate-300 bg-white px-2 py-1.5 text-left text-sm text-slate-700 hover:bg-slate-50"
-            >
-              {defaultName || 'Aucun'}
-            </button>
-            {nameOpen && (
-              <ul
-                role="listbox"
-                className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded border border-slate-200 bg-white shadow-lg"
-              >
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDefaultName('');
-                      setNameOpen(false);
-                    }}
-                    className="w-full px-3 py-1.5 text-left text-sm text-slate-500 hover:bg-slate-50"
-                  >
-                    Aucun
-                  </button>
-                </li>
-                {people.map((p) => (
-                  <li key={p.name}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDefaultName(p.name);
-                        setNameOpen(false);
-                      }}
-                      className={`w-full px-3 py-1.5 text-left text-sm hover:bg-slate-50 ${
-                        defaultName === p.name ? 'font-medium text-blue-700' : 'text-slate-700'
-                      }`}
-                    >
-                      {p.name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+        <div className="mt-4">
+          <span className="block text-sm font-medium text-slate-600">Noms par défaut</span>
+          <div className="mt-1">
+            <PersonMultiSelect
+              people={people}
+              selected={defaultNames}
+              onToggle={(name) =>
+                setDefaultNames((prev) =>
+                  prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+                )
+              }
+            />
           </div>
-        </label>
+        </div>
 
         <div className="mt-5 flex justify-end gap-2">
           <button
@@ -163,7 +125,7 @@ export function ConfigModal({ open, onClose }: Props) {
               dispatch(
                 configUpdateRequested({
                   startDate: startDate || null,
-                  defaultName: defaultName || null,
+                  defaultNames,
                 }),
               );
               onClose();

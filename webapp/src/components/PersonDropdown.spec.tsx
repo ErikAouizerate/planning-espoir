@@ -14,11 +14,11 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
       warnings: [],
       error: null,
     },
-    schedule: { status: 'loaded', month: '2026-08', days: {}, error: null },
+    schedule: { status: 'loaded', month: '2026-08', days: {}, sundayWeeks: null, error: null },
     selection: { names: [] },
     config: {
       status: 'loaded',
-      config: { startDate: null, defaultName: null, fileName: null },
+      config: { startDate: null, defaultNames: [], fileName: null },
       error: null,
     },
     colors: { palette: ['#ff0000'] },
