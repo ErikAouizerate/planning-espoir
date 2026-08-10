@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { configFetchRequested, planningUploadRequested, scheduleFetchStart } from './actions';
+import {
+  configFetchRequested,
+  configUpdateRequested,
+  planningUploadRequested,
+  scheduleFetchStart,
+} from './actions';
 import { configureStore } from './store';
 
 describe('apiMiddleware', () => {
@@ -15,7 +20,11 @@ describe('apiMiddleware', () => {
     const fetchMock = vi.mocked(fetch);
     fetchMock.mockResolvedValueOnce(
       new Response(
-        JSON.stringify({ startDate: '2026-07-27', defaultName: 'TAUZIN Caroline', fileName: null }),
+        JSON.stringify({
+          startDate: '2026-07-27',
+          defaultNames: ['TAUZIN Caroline'],
+          fileName: null,
+        }),
         { status: 200 },
       ),
     );
@@ -37,10 +46,10 @@ describe('apiMiddleware', () => {
     });
   });
 
-  it('does not select anything when the default name is null', async () => {
+  it('does not select anything when the default names are empty', async () => {
     const fetchMock = vi.mocked(fetch);
     fetchMock.mockResolvedValueOnce(
-      new Response(JSON.stringify({ startDate: null, defaultName: null, fileName: null }), {
+      new Response(JSON.stringify({ startDate: null, defaultNames: [], fileName: null }), {
         status: 200,
       }),
     );
@@ -57,7 +66,11 @@ describe('apiMiddleware', () => {
     const fetchMock = vi.mocked(fetch);
     const configBody = () =>
       new Response(
-        JSON.stringify({ startDate: '2026-07-27', defaultName: 'TAUZIN Caroline', fileName: null }),
+        JSON.stringify({
+          startDate: '2026-07-27',
+          defaultNames: ['TAUZIN Caroline'],
+          fileName: null,
+        }),
         { status: 200 },
       );
     fetchMock.mockResolvedValueOnce(configBody()).mockResolvedValueOnce(configBody());
@@ -81,6 +94,61 @@ describe('apiMiddleware', () => {
     });
   });
 
+  it('selects all default names present in the planning after a config fetch', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          startDate: '2026-07-27',
+          defaultNames: ['TAUZIN Caroline', 'BOB Dylan', 'Inconnu'],
+          fileName: null,
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const store = configureStore();
+    store.dispatch({
+      type: 'PLANNING_FETCH_SUCCESS',
+      payload: {
+        startDate: '2026-07-27',
+        people: [
+          { name: 'TAUZIN Caroline', role: 'R', colorIndex: 0, weeks: [] },
+          { name: 'BOB Dylan', role: 'R', colorIndex: 1, weeks: [] },
+        ],
+        warnings: [],
+      },
+    });
+
+    store.dispatch(configFetchRequested());
+
+    await vi.waitFor(() => {
+      expect(store.getState().selection.names).toEqual(['TAUZIN Caroline', 'BOB Dylan']);
+    });
+  });
+
+  it('does not change the selection after a config update', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          startDate: '2026-07-27',
+          defaultNames: ['BOB Dylan'],
+          fileName: null,
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const store = configureStore();
+    store.dispatch(configUpdateRequested({ defaultNames: ['BOB Dylan'] }));
+
+    await vi.waitFor(() => {
+      expect(store.getState().config.config.defaultNames).toEqual(['BOB Dylan']);
+    });
+    expect(store.getState().selection.names).toEqual([]);
+  });
+
   it('refetches config after a successful planning upload', async () => {
     const fetchMock = vi.mocked(fetch);
 
@@ -97,7 +165,7 @@ describe('apiMiddleware', () => {
     );
     // 2. config refetch (dispatched before the schedule refetch)
     fetchMock.mockResolvedValueOnce(
-      new Response(JSON.stringify({ startDate: '2026-07-27', defaultName: null }), { status: 200 }),
+      new Response(JSON.stringify({ startDate: '2026-07-27', defaultNames: [] }), { status: 200 }),
     );
     // 3. schedule fetch after upload
     fetchMock.mockResolvedValueOnce(

@@ -45,12 +45,13 @@ const initialSchedule: ScheduleState = {
   status: 'idle',
   month: '',
   days: null,
+  sundayWeeks: null,
   error: null,
 };
 
 const initialConfig: ConfigState = {
   status: 'idle',
-  config: { startDate: null, defaultName: null, fileName: null },
+  config: { startDate: null, defaultNames: [], fileName: null },
   error: null,
 };
 
@@ -102,12 +103,14 @@ function scheduleReducer(state: ScheduleState = initialSchedule, action: Action)
       const payload = action.payload as {
         month: string;
         days: Record<string, PersonDay[]>;
+        sundayWeeks: Record<string, number>;
       };
       return {
         ...state,
         status: 'loaded',
         month: payload.month,
         days: payload.days,
+        sundayWeeks: payload.sundayWeeks,
         error: null,
       };
     }

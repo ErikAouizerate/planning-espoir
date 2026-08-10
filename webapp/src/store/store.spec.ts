@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   planningFetchError,
   scheduleFetchRequested,
+  scheduleFetchSuccess,
   selectionAdd,
   selectionToggle,
 } from './actions';
@@ -44,6 +45,14 @@ describe('store', () => {
     const store = configureStore();
     store.dispatch(scheduleFetchRequested('2026-08'));
     expect(store.getState().schedule.status).toBe('loading');
+  });
+
+  it('stores sundayWeeks on schedule fetch success', () => {
+    const store = configureStore();
+    store.dispatch(
+      scheduleFetchSuccess({ month: '2026-08', days: {}, sundayWeeks: { '2026-08-02': 1 } }),
+    );
+    expect(store.getState().schedule.sundayWeeks).toEqual({ '2026-08-02': 1 });
   });
 
   it('starts with an empty auth state', () => {

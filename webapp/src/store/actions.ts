@@ -50,6 +50,7 @@ export interface PlanningPayload {
 export interface SchedulePayload {
   month: string;
   days: Record<string, PersonDay[]>;
+  sundayWeeks: Record<string, number>;
 }
 
 export function planningFetchRequested(): Action<typeof PLANNING_FETCH_REQUESTED> {

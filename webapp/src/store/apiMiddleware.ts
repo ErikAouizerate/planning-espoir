@@ -79,10 +79,11 @@ export const apiMiddleware: Middleware<object, RootState> = (store) => (next) =>
         .fetchConfig()
         .then((data) => {
           store.dispatch(configFetchSuccess(data));
-          const name = data.defaultName;
           const people = store.getState().planning.people ?? [];
-          if (name && people.some((p) => p.name === name)) {
-            store.dispatch(selectionAdd(name));
+          for (const name of data.defaultNames) {
+            if (people.some((p) => p.name === name)) {
+              store.dispatch(selectionAdd(name));
+            }
           }
         })
         .catch((err: Error) => store.dispatch(configFetchError(err.message)));
