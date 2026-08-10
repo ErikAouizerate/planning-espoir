@@ -87,6 +87,30 @@ describe('MonthCalendar', () => {
     expect(screen.getByRole('button', { name: 'Mois suivant' })).toBeInTheDocument();
   });
 
+  it('renders S{n} in Sunday cells and nothing in other cells', () => {
+    render(
+      <Provider
+        store={createTestStore(
+          makeState({
+            schedule: {
+              status: 'loaded',
+              month: '2026-08',
+              days: {},
+              sundayWeeks: { '2026-08-02': 1, '2026-08-09': 2 },
+              error: null,
+            },
+          }),
+        )}
+      >
+        <MonthCalendar />
+      </Provider>,
+    );
+    expect(screen.getByTestId('day-2026-08-02')).toHaveTextContent('S1');
+    expect(screen.getByTestId('day-2026-08-09')).toHaveTextContent('S2');
+    expect(screen.getByTestId('day-2026-08-01')).not.toHaveTextContent('S');
+    expect(screen.getByTestId('day-2026-08-03')).not.toHaveTextContent('S');
+  });
+
   it('highlights the current day cell with a distinct background', () => {
     const today = todayKey();
     const [year, month] = today.split('-');

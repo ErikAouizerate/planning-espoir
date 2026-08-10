@@ -8,6 +8,7 @@ export function MonthCalendar() {
   const dispatch = useDispatch();
   const month = useSelector((state: RootState) => state.schedule.month);
   const days = useSelector((state: RootState) => state.schedule.days);
+  const sundayWeeks = useSelector((state: RootState) => state.schedule.sundayWeeks);
   const selection = useSelector((state: RootState) => state.selection.names);
   const palette = useSelector((state: RootState) => state.colors.palette);
   const today = todayKey();
@@ -63,8 +64,9 @@ export function MonthCalendar() {
                 data-testid={date ? `day-${date}` : undefined}
               >
                 {date && (
-                  <div className="text-[10px] text-slate-400 sm:text-xs">
-                    {Number(date.slice(8, 10))}
+                  <div className="flex items-baseline justify-between text-[10px] text-slate-400 sm:text-xs">
+                    <span>{Number(date.slice(8, 10))}</span>
+                    {sundayWeeks?.[date] !== undefined && <span>S{sundayWeeks[date]}</span>}
                   </div>
                 )}
                 <div className="mt-0.5 flex flex-col gap-0.5 sm:mt-1">
