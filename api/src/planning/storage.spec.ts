@@ -1,4 +1,4 @@
-import { mkdtemp, rm } from 'fs/promises';
+import { mkdtemp, rm, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { Storage } from './storage';
@@ -19,8 +19,20 @@ describe('Storage', () => {
   it('returns null config defaults when nothing is stored', async () => {
     await expect(storage.loadConfig()).resolves.toEqual({
       startDate: null,
-      defaultName: null,
+      defaultNames: [],
       fileName: null,
+    });
+  });
+
+  it('normalizes a legacy config file with defaultName', async () => {
+    await writeFile(
+      join(dir, 'config.json'),
+      JSON.stringify({ startDate: '2026-07-27', defaultName: 'BOB Dylan', fileName: 'p.xlsx' }),
+    );
+    await expect(storage.loadConfig()).resolves.toEqual({
+      startDate: '2026-07-27',
+      defaultNames: [],
+      fileName: 'p.xlsx',
     });
   });
 
@@ -41,10 +53,14 @@ describe('Storage', () => {
   });
 
   it('round-trips config', async () => {
-    await storage.saveConfig({ startDate: '2026-07-27', defaultName: null, fileName: null });
+    await storage.saveConfig({
+      startDate: '2026-07-27',
+      defaultNames: ['BOB Dylan'],
+      fileName: null,
+    });
     await expect(storage.loadConfig()).resolves.toEqual({
       startDate: '2026-07-27',
-      defaultName: null,
+      defaultNames: ['BOB Dylan'],
       fileName: null,
     });
   });

@@ -96,11 +96,24 @@ describe('Planning (e2e)', () => {
     await request(app.getHttpServer()).get('/api/planning/schedule?month=2026-00').expect(400);
   });
 
+  it('exposes the planning week number for each Sunday of the month', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/api/planning/schedule?month=2026-08')
+      .expect(200);
+    expect(res.body.sundayWeeks).toEqual({
+      '2026-08-02': 1,
+      '2026-08-09': 2,
+      '2026-08-16': 3,
+      '2026-08-23': 4,
+      '2026-08-30': 5,
+    });
+  });
+
   it('round-trips config via GET/PUT', async () => {
     const before = await request(app.getHttpServer()).get('/api/planning/config').expect(200);
     expect(before.body).toEqual({
       startDate: '2026-07-27',
-      defaultName: null,
+      defaultNames: [],
       fileName: 'Copie de Planning ecluse Proposition Aout 2026.xlsx',
     });
     const put = await request(app.getHttpServer())
@@ -110,6 +123,13 @@ describe('Planning (e2e)', () => {
     expect(put.body.startDate).toBe('2026-08-01');
     const after = await request(app.getHttpServer()).get('/api/planning/config').expect(200);
     expect(after.body.startDate).toBe('2026-08-01');
+    const putNames = await request(app.getHttpServer())
+      .put('/api/planning/config')
+      .send({ defaultNames: ['BOB Dylan', 'TAUZIN Caroline'] })
+      .expect(200);
+    expect(putNames.body.defaultNames).toEqual(['BOB Dylan', 'TAUZIN Caroline']);
+    const afterNames = await request(app.getHttpServer()).get('/api/planning/config').expect(200);
+    expect(afterNames.body.defaultNames).toEqual(['BOB Dylan', 'TAUZIN Caroline']);
   });
 
   it('rejects a malformed startDate on PUT', async () => {
@@ -127,6 +147,17 @@ describe('Planning (e2e)', () => {
     await request(app.getHttpServer())
       .put('/api/planning/config')
       .send({ startDate: '2026-02-30' })
+      .expect(400);
+  });
+
+  it('rejects invalid defaultNames on PUT', async () => {
+    await request(app.getHttpServer())
+      .put('/api/planning/config')
+      .send({ defaultNames: 'BOB Dylan' })
+      .expect(400);
+    await request(app.getHttpServer())
+      .put('/api/planning/config')
+      .send({ defaultNames: ['BOB Dylan', 42] })
       .expect(400);
   });
 });

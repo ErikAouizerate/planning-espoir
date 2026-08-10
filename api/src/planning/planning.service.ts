@@ -71,16 +71,20 @@ export class PlanningService {
     if (!config.startDate) throw new BadRequestException('startDate is not configured');
 
     const days: Record<string, PersonDay[]> = {};
+    const sundayWeeks: Record<string, number> = {};
     for (const date of monthDays(month)) {
       const week = weekIndexForDate(config.startDate, date);
       const day = weekdayIndex(date);
+      if (day === 6) {
+        sundayWeeks[date] = week + 1; // 1-based: 1 = S1 .. 6 = S6
+      }
       days[date] = stored.people.map((p) => ({
         name: p.name,
         colorIndex: p.colorIndex,
         cell: p.weeks[week][day],
       }));
     }
-    return { month, days };
+    return { month, days, sundayWeeks };
   }
 
   async getConfig(): Promise<Config> {
@@ -95,8 +99,14 @@ export class PlanningService {
       }
       config.startDate = update.startDate;
     }
-    if (update.defaultName !== undefined) {
-      config.defaultName = update.defaultName;
+    if (update.defaultNames !== undefined) {
+      if (
+        !Array.isArray(update.defaultNames) ||
+        update.defaultNames.some((n) => typeof n !== 'string')
+      ) {
+        throw new BadRequestException('defaultNames must be an array of strings');
+      }
+      config.defaultNames = update.defaultNames;
     }
     await this.storage.saveConfig(config);
     return config;
