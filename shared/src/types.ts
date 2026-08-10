@@ -22,6 +22,7 @@ export interface PersonDay {
 export interface ScheduleMonth {
   month: string; // "YYYY-MM"
   days: Record<string, PersonDay[]>; // "YYYY-MM-DD" -> PersonDay[]
+  sundayWeeks: Record<string, number>; // Sunday "YYYY-MM-DD" -> planning week number 1..6
 }
 
 export interface PlanningData {
@@ -30,7 +31,7 @@ export interface PlanningData {
 
 export interface Config {
   startDate: string | null; // "YYYY-MM-DD"
-  defaultName: string | null;
+  defaultNames: string[];
   fileName: string | null; // original name of the uploaded planning file
 }
 
