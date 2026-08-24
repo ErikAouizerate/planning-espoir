@@ -81,34 +81,34 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATES-01 |  | Pending |
-| DATES-02 |  | Pending |
-| DATES-03 |  | Pending |
-| DATES-04 |  | Pending |
-| DATES-05 |  | Pending |
-| PARS-01 |  | Pending |
-| PARS-02 |  | Pending |
-| PARS-03 |  | Pending |
-| PARS-04 |  | Pending |
-| PARS-05 |  | Pending |
-| WEB-01 |  | Pending |
-| WEB-02 |  | Pending |
-| WEB-03 |  | Pending |
-| WEB-04 |  | Pending |
-| SEC-01 |  | Pending |
-| SEC-02 |  | Pending |
-| SEC-03 |  | Pending |
-| SEC-04 |  | Pending |
-| SEC-05 |  | Pending |
-| SEC-06 |  | Pending |
-| SEC-07 |  | Pending |
-| SEC-08 |  | Pending |
+| DATES-01 | Phase 1 | Pending |
+| DATES-02 | Phase 1 | Pending |
+| DATES-03 | Phase 1 | Pending |
+| DATES-04 | Phase 1 | Pending |
+| DATES-05 | Phase 1 | Pending |
+| PARS-01 | Phase 2 | Pending |
+| PARS-02 | Phase 2 | Pending |
+| PARS-03 | Phase 2 | Pending |
+| PARS-04 | Phase 2 | Pending |
+| PARS-05 | Phase 2 | Pending |
+| WEB-01 | Phase 3 | Pending |
+| WEB-02 | Phase 3 | Pending |
+| WEB-03 | Phase 3 | Pending |
+| WEB-04 | Phase 3 | Pending |
+| SEC-01 | Phase 4 | Pending |
+| SEC-02 | Phase 4 | Pending |
+| SEC-03 | Phase 4 | Pending |
+| SEC-04 | Phase 4 | Pending |
+| SEC-05 | Phase 4 | Pending |
+| SEC-06 | Phase 4 | Pending |
+| SEC-07 | Phase 4 | Pending |
+| SEC-08 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 22 total
-- Mapped to phases: 0
-- Unmapped: 22 ⚠️ (filled by roadmap creation)
+- Mapped to phases: 22
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-08-24*
-*Last updated: 2026-08-24 after initial definition*
+*Last updated: 2026-08-24 after roadmap creation*
