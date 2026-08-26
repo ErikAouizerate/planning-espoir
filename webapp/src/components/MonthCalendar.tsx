@@ -8,7 +8,7 @@ export function MonthCalendar() {
   const dispatch = useDispatch();
   const month = useSelector((state: RootState) => state.schedule.month);
   const days = useSelector((state: RootState) => state.schedule.days);
-  const sundayWeeks = useSelector((state: RootState) => state.schedule.sundayWeeks);
+  const mondayWeeks = useSelector((state: RootState) => state.schedule.mondayWeeks);
   const selection = useSelector((state: RootState) => state.selection.names);
   const palette = useSelector((state: RootState) => state.colors.palette);
   const today = todayKey();
@@ -50,25 +50,24 @@ export function MonthCalendar() {
             </div>
           ))}
           {grid.flat().map((date, idx) => {
-            const personDays = date
-              ? (days[date] ?? []).filter((pd) => selection.includes(pd.name))
-              : [];
+            const personDays = (days[date] ?? []).filter((pd) => selection.includes(pd.name));
             const isLastCol = idx % 7 === 6;
             const isToday = date === today;
+            const isAdjacent = date.slice(0, 7) !== month;
             return (
               <div
                 key={idx}
                 className={`min-h-20 border-b p-0.5 sm:min-h-24 sm:p-1 ${
                   isToday ? 'bg-blue-200' : ''
-                } ${isLastCol ? 'border-slate-200' : 'border-r border-b border-slate-200'}`}
-                data-testid={date ? `day-${date}` : undefined}
+                } ${isAdjacent ? 'opacity-50' : ''} ${
+                  isLastCol ? 'border-slate-200' : 'border-r border-b border-slate-200'
+                }`}
+                data-testid={`day-${date}`}
               >
-                {date && (
-                  <div className="flex items-baseline justify-between text-[10px] text-slate-400 sm:text-xs">
-                    <span>{Number(date.slice(8, 10))}</span>
-                    {sundayWeeks?.[date] !== undefined && <span>S{sundayWeeks[date]}</span>}
-                  </div>
-                )}
+                <div className="flex items-baseline justify-between text-[10px] text-slate-400 sm:text-xs">
+                  <span>{Number(date.slice(8, 10))}</span>
+                  {mondayWeeks?.[date] !== undefined && <span>S{mondayWeeks[date]}</span>}
+                </div>
                 <div className="mt-0.5 flex flex-col gap-0.5 sm:mt-1">
                   {personDays.map((pd) => (
                     <DayCell

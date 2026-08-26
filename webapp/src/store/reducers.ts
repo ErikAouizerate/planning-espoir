@@ -45,7 +45,7 @@ const initialSchedule: ScheduleState = {
   status: 'idle',
   month: '',
   days: null,
-  sundayWeeks: null,
+  mondayWeeks: null,
   error: null,
 };
 
@@ -103,14 +103,14 @@ function scheduleReducer(state: ScheduleState = initialSchedule, action: Action)
       const payload = action.payload as {
         month: string;
         days: Record<string, PersonDay[]>;
-        sundayWeeks: Record<string, number>;
+        mondayWeeks: Record<string, number>;
       };
       return {
         ...state,
         status: 'loaded',
         month: payload.month,
         days: payload.days,
-        sundayWeeks: payload.sundayWeeks,
+        mondayWeeks: payload.mondayWeeks,
         error: null,
       };
     }

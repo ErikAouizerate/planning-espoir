@@ -3,6 +3,7 @@ import {
   configFetchRequested,
   configUpdateRequested,
   planningUploadRequested,
+  scheduleFetchRequested,
   scheduleFetchStart,
 } from './actions';
 import { configureStore } from './store';
@@ -167,10 +168,12 @@ describe('apiMiddleware', () => {
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({ startDate: '2026-07-27', defaultNames: [] }), { status: 200 }),
     );
-    // 3. schedule fetch after upload
-    fetchMock.mockResolvedValueOnce(
-      new Response(JSON.stringify({ month: '2026-08', days: {} }), { status: 200 }),
-    );
+    // 3-5. schedule refetch after upload (previous, current and next month)
+    for (const month of ['2026-07', '2026-08', '2026-09']) {
+      fetchMock.mockResolvedValueOnce(
+        new Response(JSON.stringify({ month, days: {}, mondayWeeks: {} }), { status: 200 }),
+      );
+    }
 
     const store = configureStore();
     // seed the displayed month so the schedule refetch fires
@@ -179,7 +182,7 @@ describe('apiMiddleware', () => {
     store.dispatch(planningUploadRequested(new File(['x'], 'planning.xlsx')));
 
     await vi.waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledTimes(3);
+      expect(fetchMock).toHaveBeenCalledTimes(5);
     });
 
     const configRequests = fetchMock.mock.calls.filter(([url]) =>
@@ -190,5 +193,58 @@ describe('apiMiddleware', () => {
     await vi.waitFor(() => {
       expect(store.getState().config.config.startDate).toBe('2026-07-27');
     });
+  });
+
+  it('fetches the previous, current and next month schedules and merges them', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const monthBody = (month: string, dayKey: string) =>
+      new Response(
+        JSON.stringify({ month, days: { [dayKey]: [] }, mondayWeeks: { [dayKey]: 1 } }),
+        { status: 200 },
+      );
+    fetchMock
+      .mockResolvedValueOnce(monthBody('2026-07', '2026-07-27'))
+      .mockResolvedValueOnce(monthBody('2026-08', '2026-08-03'))
+      .mockResolvedValueOnce(monthBody('2026-09', '2026-08-31'));
+
+    const store = configureStore();
+    store.dispatch(scheduleFetchRequested('2026-08'));
+
+    await vi.waitFor(() => {
+      expect(store.getState().schedule.status).toBe('loaded');
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    const urls = fetchMock.mock.calls.map(([url]) => String(url));
+    expect(urls).toContain('/api/planning/schedule?month=2026-07');
+    expect(urls).toContain('/api/planning/schedule?month=2026-08');
+    expect(urls).toContain('/api/planning/schedule?month=2026-09');
+
+    const schedule = store.getState().schedule;
+    expect(schedule.month).toBe('2026-08');
+    expect(Object.keys(schedule.days ?? {})).toEqual(['2026-07-27', '2026-08-03', '2026-08-31']);
+    expect(schedule.mondayWeeks).toEqual({
+      '2026-07-27': 1,
+      '2026-08-03': 1,
+      '2026-08-31': 1,
+    });
+  });
+
+  it('dispatches a schedule error when any of the three month fetches fails', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const okBody = (month: string) =>
+      new Response(JSON.stringify({ month, days: {}, mondayWeeks: {} }), { status: 200 });
+    fetchMock
+      .mockResolvedValueOnce(okBody('2026-07'))
+      .mockRejectedValueOnce(new Error('boom'))
+      .mockResolvedValueOnce(okBody('2026-09'));
+
+    const store = configureStore();
+    store.dispatch(scheduleFetchRequested('2026-08'));
+
+    await vi.waitFor(() => {
+      expect(store.getState().schedule.status).toBe('error');
+    });
+    expect(store.getState().schedule.error).toBe('boom');
   });
 });

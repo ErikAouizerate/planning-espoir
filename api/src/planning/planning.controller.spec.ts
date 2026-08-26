@@ -38,11 +38,11 @@ describe('PlanningController', () => {
   });
 
   it('delegates getSchedule to the service', async () => {
-    service.getSchedule.mockResolvedValue({ month: '2026-08', days: {}, sundayWeeks: {} });
+    service.getSchedule.mockResolvedValue({ month: '2026-08', days: {}, mondayWeeks: {} });
     await expect(controller.getSchedule('2026-08')).resolves.toEqual({
       month: '2026-08',
       days: {},
-      sundayWeeks: {},
+      mondayWeeks: {},
     });
     expect(service.getSchedule).toHaveBeenCalledWith('2026-08');
   });

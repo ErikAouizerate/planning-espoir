@@ -23,7 +23,7 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
       status: 'loaded',
       month: '2026-08',
       days: {},
-      sundayWeeks: null,
+      mondayWeeks: null,
       error: null,
     },
     selection: { names: [] },

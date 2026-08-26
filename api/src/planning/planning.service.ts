@@ -71,12 +71,12 @@ export class PlanningService {
     if (!config.startDate) throw new BadRequestException('startDate is not configured');
 
     const days: Record<string, PersonDay[]> = {};
-    const sundayWeeks: Record<string, number> = {};
+    const mondayWeeks: Record<string, number> = {};
     for (const date of monthDays(month)) {
       const week = weekIndexForDate(config.startDate, date);
       const day = weekdayIndex(date);
-      if (day === 6) {
-        sundayWeeks[date] = week + 1; // 1-based: 1 = S1 .. 6 = S6
+      if (day === 0) {
+        mondayWeeks[date] = week + 1; // 1-based: 1 = S1 .. 6 = S6
       }
       days[date] = stored.people.map((p) => ({
         name: p.name,
@@ -84,7 +84,7 @@ export class PlanningService {
         cell: p.weeks[week][day],
       }));
     }
-    return { month, days, sundayWeeks };
+    return { month, days, mondayWeeks };
   }
 
   async getConfig(): Promise<Config> {

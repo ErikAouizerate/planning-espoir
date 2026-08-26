@@ -14,7 +14,7 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
       warnings: [],
       error: null,
     },
-    schedule: { status: 'loaded', month: '2026-08', days: {}, sundayWeeks: null, error: null },
+    schedule: { status: 'loaded', month: '2026-08', days: {}, mondayWeeks: null, error: null },
     selection: { names: [] },
     config: {
       status: 'loaded',

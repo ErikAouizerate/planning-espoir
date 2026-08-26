@@ -30,7 +30,7 @@ function makeState(overrides: Partial<RootState> = {}): RootState {
           { name: 'B', colorIndex: 1, cell: { type: 'off', label: 'rh' } },
         ],
       },
-      sundayWeeks: null,
+      mondayWeeks: null,
       error: null,
     },
     selection: { names: ['A', 'B'] },
@@ -87,7 +87,7 @@ describe('MonthCalendar', () => {
     expect(screen.getByRole('button', { name: 'Mois suivant' })).toBeInTheDocument();
   });
 
-  it('renders S{n} in Sunday cells and nothing in other cells', () => {
+  it('renders S{n} in Monday cells and nothing in other cells', () => {
     render(
       <Provider
         store={createTestStore(
@@ -96,7 +96,7 @@ describe('MonthCalendar', () => {
               status: 'loaded',
               month: '2026-08',
               days: {},
-              sundayWeeks: { '2026-08-02': 1, '2026-08-09': 2 },
+              mondayWeeks: { '2026-08-03': 2, '2026-08-10': 3 },
               error: null,
             },
           }),
@@ -105,10 +105,43 @@ describe('MonthCalendar', () => {
         <MonthCalendar />
       </Provider>,
     );
-    expect(screen.getByTestId('day-2026-08-02')).toHaveTextContent('S1');
-    expect(screen.getByTestId('day-2026-08-09')).toHaveTextContent('S2');
-    expect(screen.getByTestId('day-2026-08-01')).not.toHaveTextContent('S');
-    expect(screen.getByTestId('day-2026-08-03')).not.toHaveTextContent('S');
+    expect(screen.getByTestId('day-2026-08-03')).toHaveTextContent('S2');
+    expect(screen.getByTestId('day-2026-08-10')).toHaveTextContent('S3');
+    expect(screen.getByTestId('day-2026-08-02')).not.toHaveTextContent('S'); // Sunday
+    expect(screen.getByTestId('day-2026-08-04')).not.toHaveTextContent('S');
+  });
+
+  it('dims adjacent-month cells and still renders their schedule', () => {
+    render(
+      <Provider
+        store={createTestStore(
+          makeState({
+            schedule: {
+              status: 'loaded',
+              month: '2026-08',
+              days: {
+                '2026-07-27': [
+                  {
+                    name: 'A',
+                    colorIndex: 0,
+                    cell: { type: 'shift', slots: [{ start: '14:00', end: '18:00' }] },
+                  },
+                ],
+              },
+              mondayWeeks: { '2026-07-27': 1 },
+              error: null,
+            },
+          }),
+        )}
+      >
+        <MonthCalendar />
+      </Provider>,
+    );
+    const adjacent = screen.getByTestId('day-2026-07-27');
+    expect(adjacent.className).toContain('opacity-50');
+    expect(adjacent).toHaveTextContent('14:00–18:00');
+    expect(adjacent).toHaveTextContent('S1');
+    expect(screen.getByTestId('day-2026-08-03').className).not.toContain('opacity-50');
   });
 
   it('highlights the current day cell with a distinct background', () => {
@@ -122,7 +155,7 @@ describe('MonthCalendar', () => {
               status: 'loaded',
               month: `${year}-${month}`,
               days: {},
-              sundayWeeks: null,
+              mondayWeeks: null,
               error: null,
             },
           }),

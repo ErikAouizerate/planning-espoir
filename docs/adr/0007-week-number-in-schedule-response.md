@@ -1,6 +1,6 @@
 # ADR-0007: Week number in schedule response
 
-Status: Accepted
+Status: Amended by ADR-0008 (week badge moved from Sunday to Monday, `sundayWeeks` renamed `mondayWeeks`)
 
 ## Context
 

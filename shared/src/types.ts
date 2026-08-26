@@ -22,7 +22,7 @@ export interface PersonDay {
 export interface ScheduleMonth {
   month: string; // "YYYY-MM"
   days: Record<string, PersonDay[]>; // "YYYY-MM-DD" -> PersonDay[]
-  sundayWeeks: Record<string, number>; // Sunday "YYYY-MM-DD" -> planning week number 1..6
+  mondayWeeks: Record<string, number>; // Monday "YYYY-MM-DD" -> planning week number 1..6
 }
 
 export interface PlanningData {

@@ -18,19 +18,24 @@ export function shiftMonth(month: string, delta: number): string {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
 }
 
-export function monthGrid(month: string): (string | null)[][] {
+export function monthGrid(month: string): string[][] {
   const [year, monthIndex] = month.split('-').map(Number);
   const firstDay = new Date(Date.UTC(year, monthIndex - 1, 1));
   const offset = (firstDay.getUTCDay() + 6) % 7; // Monday-first
   const daysInMonth = new Date(Date.UTC(year, monthIndex, 0)).getUTCDate();
+  const cellCount = Math.ceil((offset + daysInMonth) / 7) * 7;
 
-  const cells: (string | null)[] = Array.from({ length: offset }, () => null);
-  for (let d = 1; d <= daysInMonth; d++) {
-    cells.push(`${month}-${String(d).padStart(2, '0')}`);
+  const cells: string[] = [];
+  for (let i = 0; i < cellCount; i++) {
+    const d = new Date(Date.UTC(year, monthIndex - 1, 1 - offset + i));
+    cells.push(
+      `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(
+        d.getUTCDate(),
+      ).padStart(2, '0')}`,
+    );
   }
-  while (cells.length % 7 !== 0) cells.push(null);
 
-  const weeks: (string | null)[][] = [];
+  const weeks: string[][] = [];
   for (let i = 0; i < cells.length; i += 7) {
     weeks.push(cells.slice(i, i + 7));
   }

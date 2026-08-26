@@ -96,16 +96,16 @@ describe('Planning (e2e)', () => {
     await request(app.getHttpServer()).get('/api/planning/schedule?month=2026-00').expect(400);
   });
 
-  it('exposes the planning week number for each Sunday of the month', async () => {
+  it('exposes the planning week number for each Monday of the month', async () => {
     const res = await request(app.getHttpServer())
       .get('/api/planning/schedule?month=2026-08')
       .expect(200);
-    expect(res.body.sundayWeeks).toEqual({
-      '2026-08-02': 1,
-      '2026-08-09': 2,
-      '2026-08-16': 3,
-      '2026-08-23': 4,
-      '2026-08-30': 5,
+    expect(res.body.mondayWeeks).toEqual({
+      '2026-08-03': 2,
+      '2026-08-10': 3,
+      '2026-08-17': 4,
+      '2026-08-24': 5,
+      '2026-08-31': 6,
     });
   });
 

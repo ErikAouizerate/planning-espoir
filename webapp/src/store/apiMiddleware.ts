@@ -31,6 +31,7 @@ import {
   selectionAdd,
 } from './actions';
 import type { RootState } from './types';
+import { shiftMonth } from '../utils/dates';
 
 export const apiMiddleware: Middleware<object, RootState> = (store) => (next) => (action) => {
   const typed = action as { type: string; payload?: unknown };
@@ -65,13 +66,24 @@ export const apiMiddleware: Middleware<object, RootState> = (store) => (next) =>
         .catch((err: Error) => store.dispatch(planningUploadError(err.message)));
       break;
 
-    case SCHEDULE_FETCH_REQUESTED:
-      store.dispatch(scheduleFetchStart(typed.payload as string));
-      api
-        .fetchSchedule(typed.payload as string)
-        .then((data) => store.dispatch(scheduleFetchSuccess(data)))
+    case SCHEDULE_FETCH_REQUESTED: {
+      const month = typed.payload as string;
+      store.dispatch(scheduleFetchStart(month));
+      Promise.all(
+        [shiftMonth(month, -1), month, shiftMonth(month, 1)].map((m) => api.fetchSchedule(m)),
+      )
+        .then(([prev, cur, next]) =>
+          store.dispatch(
+            scheduleFetchSuccess({
+              month,
+              days: { ...prev.days, ...cur.days, ...next.days },
+              mondayWeeks: { ...prev.mondayWeeks, ...cur.mondayWeeks, ...next.mondayWeeks },
+            }),
+          ),
+        )
         .catch((err: Error) => store.dispatch(scheduleFetchError(err.message)));
       break;
+    }
 
     case CONFIG_FETCH_REQUESTED:
       store.dispatch(configFetchStart());

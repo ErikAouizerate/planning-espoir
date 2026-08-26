@@ -47,12 +47,12 @@ describe('store', () => {
     expect(store.getState().schedule.status).toBe('loading');
   });
 
-  it('stores sundayWeeks on schedule fetch success', () => {
+  it('stores mondayWeeks on schedule fetch success', () => {
     const store = configureStore();
     store.dispatch(
-      scheduleFetchSuccess({ month: '2026-08', days: {}, sundayWeeks: { '2026-08-02': 1 } }),
+      scheduleFetchSuccess({ month: '2026-08', days: {}, mondayWeeks: { '2026-08-03': 2 } }),
     );
-    expect(store.getState().schedule.sundayWeeks).toEqual({ '2026-08-02': 1 });
+    expect(store.getState().schedule.mondayWeeks).toEqual({ '2026-08-03': 2 });
   });
 
   it('starts with an empty auth state', () => {

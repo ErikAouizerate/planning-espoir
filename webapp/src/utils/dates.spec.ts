@@ -21,13 +21,23 @@ describe('dates utils', () => {
     expect(currentMonthKey()).toBe(expected);
   });
 
-  it('builds a Monday-first month grid with null padding', () => {
-    // August 2026 starts on a Saturday
+  it('builds a Monday-first month grid padded with adjacent-month dates', () => {
+    // August 2026 starts on a Saturday and ends on a Monday
     const grid = monthGrid('2026-08');
-    expect(grid[0]).toHaveLength(7);
-    expect(grid.flat().filter((d) => d !== null)).toHaveLength(31);
-    const saturday = grid.flat().findIndex((d) => d === '2026-08-01');
-    expect(saturday).toBe(5); // Monday-first: index 5 is Saturday
+    expect(grid).toHaveLength(6);
+    for (const week of grid) expect(week).toHaveLength(7);
+    const cells = grid.flat();
+    expect(cells[0]).toBe('2026-07-27'); // Monday of the first week, in July
+    expect(cells[41]).toBe('2026-09-06'); // Sunday of the last week, in September
+    expect(cells.filter((d) => d.startsWith('2026-08'))).toHaveLength(31);
+    expect(cells[5]).toBe('2026-08-01'); // Monday-first: index 5 is Saturday
+  });
+
+  it('pads the grid across a year boundary', () => {
+    // January 2026 starts on a Thursday
+    const grid = monthGrid('2026-01');
+    expect(grid[0][0]).toBe('2025-12-29');
+    expect(grid.flat().at(-1)).toBe('2026-02-01');
   });
 
   it('labels weekdays', () => {

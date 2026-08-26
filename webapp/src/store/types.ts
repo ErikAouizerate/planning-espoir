@@ -13,7 +13,7 @@ export interface ScheduleState {
   status: Status;
   month: string;
   days: Record<string, PersonDay[]> | null;
-  sundayWeeks: Record<string, number> | null;
+  mondayWeeks: Record<string, number> | null;
   error: string | null;
 }
 
