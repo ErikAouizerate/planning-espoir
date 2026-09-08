@@ -4,8 +4,6 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vite';
 
-const apiProxyTarget = process.env.API_PROXY_TARGET ?? 'http://localhost:3000';
-
 export default defineConfig({
   envDir: '..',
   plugins: [
@@ -69,7 +67,7 @@ export default defineConfig({
     host: true,
     port: 5174,
     proxy: {
-      '/api': apiProxyTarget,
+      '/api': 'http://localhost:3000',
     },
   },
   test: {

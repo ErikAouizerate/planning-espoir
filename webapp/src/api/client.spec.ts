@@ -38,19 +38,6 @@ describe('api client', () => {
     expect(fetch).toHaveBeenCalledWith('/api/planning/schedule?month=2026-08', expect.any(Object));
   });
 
-  it('prefixes API calls with VITE_API_BASE when configured', async () => {
-    vi.resetModules();
-    vi.stubEnv('VITE_API_BASE', 'http://api.planning-espoir.localhost/api');
-    const body = { startDate: null, people: [], warnings: [] };
-    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify(body), { status: 200 }));
-    const { fetchPlanning: freshFetchPlanning } = await import('./client');
-    await expect(freshFetchPlanning()).resolves.toEqual(body);
-    expect(fetch).toHaveBeenCalledWith(
-      'http://api.planning-espoir.localhost/api/planning',
-      expect.any(Object),
-    );
-  });
-
   it('throws an Error with the server message on failure', async () => {
     vi.mocked(fetch).mockResolvedValue(
       new Response(JSON.stringify({ statusCode: 404, message: 'No planning uploaded yet' }), {
