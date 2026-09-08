@@ -48,7 +48,9 @@ Confirm any architecture change with the user before committing to it.
 
 ## Deploy
 
-GitLab CI (`.gitlab-ci.yml`): install → lint ∥ build → test → deploy. Deploy is a curl POST to `DEPLOY_WEBHOOK_URL`, `main` only. Docker: `docker-compose.yml` builds api + webapp (nginx, host port 8083), API data persisted in the `api-data` volume.
+GitLab CI (`.gitlab-ci.yml`): install → lint ∥ build → test → deploy. Deploy is a curl POST to `DEPLOY_WEBHOOK_URL`, `main` only. Docker: `docker-compose.yml` builds api + webapp (nginx, host port 8083), API data persisted in the `api-data` volume. Both `Dockerfile`s expose a `dev` stage (`docker-compose.dev.yml`), the prod runtime/nginx stages stay the default target.
+
+Containerized dev (no host ports): `docker compose -f docker-compose.dev.yml up --build`. Requires an external Traefik network `local-proxy`; serves the webapp on `http://planning-espoir.localhost` and the API on its own domain `http://api.planning-espoir.localhost`. Sources are bind-mounted (`./api`, `./webapp`) with nest/vite watch; the webapp calls the API cross-origin via `VITE_API_BASE=http://api.planning-espoir.localhost/api` (build-time, defaults to relative `/api`); API data lives in `./api/data` (`DATA_DIR=/app/api/data`).
 
 ## Key domain facts (details in `docs/adr/`)
 

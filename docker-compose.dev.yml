@@ -1,0 +1,47 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+      target: dev
+    env_file: .env
+    environment:
+      DATA_DIR: /app/api/data
+    volumes:
+      - ./api:/app/api
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=local-proxy
+      - traefik.http.routers.planning-espoir-api.rule=Host(`api.planning-espoir.localhost`)
+      - traefik.http.routers.planning-espoir-api.entrypoints=web
+      - traefik.http.routers.planning-espoir-api.service=planning-espoir-api
+      - traefik.http.services.planning-espoir-api.loadbalancer.server.port=3000
+
+  webapp:
+    build:
+      context: .
+      dockerfile: webapp/Dockerfile
+      target: dev
+    env_file: .env
+    environment:
+      VITE_API_BASE: http://api.planning-espoir.localhost/api
+    volumes:
+      - ./webapp:/app/webapp
+    networks:
+      - proxy
+    depends_on:
+      - api
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=local-proxy
+      - traefik.http.routers.planning-espoir-webapp.rule=Host(`planning-espoir.localhost`)
+      - traefik.http.routers.planning-espoir-webapp.entrypoints=web
+      - traefik.http.routers.planning-espoir-webapp.service=planning-espoir-webapp
+      - traefik.http.services.planning-espoir-webapp.loadbalancer.server.port=5174
+
+networks:
+  proxy:
+    external: true
+    name: local-proxy

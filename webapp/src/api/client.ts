@@ -12,6 +12,12 @@ export function getAuthToken(): string | null {
   return keycloak.getToken();
 }
 
+const apiBase = (import.meta.env.VITE_API_BASE as string | undefined) ?? '/api';
+
+function apiUrl(path: string): string {
+  return `${apiBase}${path}`;
+}
+
 let redirecting = false;
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -41,29 +47,32 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export function fetchAuthMe(): Promise<{ username: string }> {
-  return request<{ username: string }>('/api/auth/me');
+  return request<{ username: string }>(apiUrl('/auth/me'));
 }
 
 export function fetchPlanning(): Promise<PlanningResponse> {
-  return request<PlanningResponse>('/api/planning');
+  return request<PlanningResponse>(apiUrl('/planning'));
 }
 
 export function uploadPlanning(file: File): Promise<PlanningResponse> {
   const form = new FormData();
   form.append('file', file);
-  return request<PlanningResponse>('/api/planning', { method: 'POST', body: form });
+  return request<PlanningResponse>(apiUrl('/planning'), {
+    method: 'POST',
+    body: form,
+  });
 }
 
 export function fetchSchedule(month: string): Promise<ScheduleMonth> {
-  return request<ScheduleMonth>(`/api/planning/schedule?month=${month}`);
+  return request<ScheduleMonth>(apiUrl(`/planning/schedule?month=${month}`));
 }
 
 export function fetchConfig(): Promise<Config> {
-  return request<Config>('/api/planning/config');
+  return request<Config>(apiUrl('/planning/config'));
 }
 
 export function updateConfig(update: Partial<Config>): Promise<Config> {
-  return request<Config>('/api/planning/config', {
+  return request<Config>(apiUrl('/planning/config'), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(update),
