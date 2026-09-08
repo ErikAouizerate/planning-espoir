@@ -51,6 +51,16 @@ describe('api client', () => {
     );
   });
 
+  it('falls back to the relative /api base when VITE_API_BASE is empty', async () => {
+    vi.resetModules();
+    vi.stubEnv('VITE_API_BASE', '');
+    const body = { startDate: null, people: [], warnings: [] };
+    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify(body), { status: 200 }));
+    const { fetchPlanning: freshFetchPlanning } = await import('./client');
+    await expect(freshFetchPlanning()).resolves.toEqual(body);
+    expect(fetch).toHaveBeenCalledWith('/api/planning', expect.any(Object));
+  });
+
   it('throws an Error with the server message on failure', async () => {
     vi.mocked(fetch).mockResolvedValue(
       new Response(JSON.stringify({ statusCode: 404, message: 'No planning uploaded yet' }), {

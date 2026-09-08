@@ -12,7 +12,7 @@ export function getAuthToken(): string | null {
   return keycloak.getToken();
 }
 
-const apiBase = (import.meta.env.VITE_API_BASE as string | undefined) ?? '/api';
+const apiBase = (import.meta.env.VITE_API_BASE as string | undefined) || '/api';
 
 function apiUrl(path: string): string {
   return `${apiBase}${path}`;
