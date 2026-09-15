@@ -79,6 +79,108 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-08-24
-Stopped at: Roadmap creation complete — 4 phases defined, 22/22 v1 requirements mapped, coverage validated
+Last session: 2026-09-08
+Stopped at: Docker dev setup behind Traefik done; prod regression fixed and committed.
 Resume file: None
+
+## ⚠️ À FINIR — debug prod (pas encore déployé/vérifié)
+
+**Le correctif prod (`63f707e`) est commité mais PAS encore testé sur le serveur.**
+La prod casse toujours tant que l'image webapp n'est pas rebuildée avec ce commit.
+
+### Cause du bug prod
+
+Le `webapp/Dockerfile` (stage build) définit toujours `ENV VITE_API_BASE=$VITE_API_BASE`.
+La prod ne passe pas `VITE_API_BASE` en build arg → l'ENV devient **chaîne vide `""`**.
+Le code utilisait `?? '/api'` (nullish) qui ne remplace PAS `""` → `apiBase = ""`.
+Toutes les requêtes devenaient `/planning` au lieu de `/api/planning` → nginx ne
+proxye pas → app cassée.
+
+### Correctif appliqué (commit `63f707e`)
+
+`webapp/src/api/client.ts:15` — `||` au lieu de `??` :
+```ts
+const apiBase = (import.meta.env.VITE_API_BASE as string | undefined) || '/api';
+```
+Test ajouté : `client.spec.ts` « falls back to the relative /api base when VITE_API_BASE is empty ».
+
+### 🔴 À faire sur le serveur (Dokploy) — dans l'ordre
+
+1. **REBUILD l'image webapp** (pas juste restart !) — sinon l'ancien build cassé persiste.
+2. Trouver le conteneur :
+   ```sh
+   docker ps | grep webapp
+   ```
+3. Vérifier que le bundle servi contient bien `/api` relatif (et PAS le domaine absolu) :
+   ```sh
+   docker exec -it <CONTAINER> sh
+   grep -rohE "(https?://api[^\"]*|/api/planning)" /usr/share/nginx/html/assets/*.js | sort -u | head
+   # ✅ attendu : /api/planning (relatif)
+   # ❌ bug (si présent) : /planning (sans /api)  → image pas rebuildée
+   ```
+4. Vérifier le proxy nginx → API depuis le conteneur :
+   ```sh
+   wget -qO- http://api:3000/api/planning/config
+   ```
+5. Vérifier depuis l'hôte via le port publié prod (8083) :
+   ```sh
+   curl -i 'http://localhost:8083/api/planning/schedule?month=2026-10' -H 'Accept: application/json'
+   ```
+
+### Comment ça doit marcher en prod (après rebuild)
+
+| Mode | VITE_API_BASE | Résultat |
+|------|---------------|----------|
+| **Prod** (docker-compose.yml + nginx) | vide → `/api` | nginx proxye `/api` → api:3000 |
+
+---
+
+## Session Log — 2026-09-08 (Docker dev + Traefik + API cross-origin)
+
+### What was done (commits)
+
+- `cc57446` feat(dev): containerized dev behind Traefik, API on own domain
+- `63f707e` fix(webapp): treat empty VITE_API_BASE as the relative /api default
+
+### Files changed
+
+- `docker-compose.dev.yml` (new): dev containers, **zero host ports**, external
+  Traefik network `local-proxy`. webapp on `http://planning-espoir.localhost`,
+  API on `http://api.planning-espoir.localhost`.
+- `api/Dockerfile`: added `deps`/`dev` stages (`nest start --watch`); prod
+  `build`/`runtime` stages unchanged (default target = prod).
+- `webapp/Dockerfile`: added `deps`/`dev` stages (`vite`); added optional
+  `VITE_API_BASE` ARG/ENV to the build stage; nginx runtime unchanged.
+- `webapp/src/api/client.ts`: API base configurable via `VITE_API_BASE`,
+  defaults to relative `/api`. Uses `||` (empty string falls back to `/api`).
+- `webapp/src/api/client.spec.ts`: tests for configured base and empty-base fallback.
+- `webapp/vite.config.ts`: `/api` proxy target configurable via `API_PROXY_TARGET`
+  (used only for local `yarn dev`; not used in the dockerized dev).
+- `.env.example`, `AGENTS.md`: documented `VITE_API_BASE`.
+- `docker-compose.yml` (prod): **untouched** — still nginx, host port 8083.
+
+### How it works now (three modes)
+
+| Mode | VITE_API_BASE | Result |
+|------|---------------|--------|
+| Prod (docker-compose.yml + nginx) | empty → `/api` | nginx proxies `/api` → api:3000 |
+| Dev docker (docker-compose.dev.yml) | `http://api.planning-espoir.localhost/api` | browser calls API cross-origin on its own domain |
+| Dev local host (`yarn dev`) | empty → `/api` | Vite proxy `/api` → localhost:3000 |
+
+### How to run dev
+
+```sh
+docker compose -f docker-compose.dev.yml up --build
+# requires Traefik on external network `local-proxy`, entrypoint `web`
+# UI: http://planning-espoir.localhost   API: http://api.planning-espoir.localhost
+```
+
+### Known caveats / follow-ups
+
+- **CORS**: `app.enableCors()` (api/src/main.ts:7) allows all origins; fine for
+  dev (auth off, no credentials). If auth is ever enabled cross-origin, restrict
+  origins.
+- **Pre-existing failing test (not ours)**: `webapp/src/api/client.spec.ts`
+  "redirects to the gateway URL on a 403 when auth is enabled" fails on `main`
+  too (expects `http://localhost:5173`). Unrelated to this work; not yet fixed.
+- `.claude/settings.local.json` is untracked local config — do not commit.
