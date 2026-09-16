@@ -87,7 +87,7 @@ Redux with **classic reducers and custom middlewares only**. RTK `configureStore
 ## Tooling & quality gates
 
 - Scripts: `dev` (vite), `build` (`tsc --noEmit && vite build` — typecheck is part of the build), `test` (`vitest run`), `lint` (`eslint src`), `typecheck`. Root equivalents orchestrate all workspaces (see root `AGENTS.md`).
-- ESLint flat config: `typescript-eslint` recommended + `eslint-plugin-prettier` with **`prettier/prettier: error`** — formatting is a lint gate. Run `yarn format` at the repo root when lint fails on style.
+- ESLint flat config: `typescript-eslint` recommended + `eslint-plugin-prettier` with **`prettier/prettier: error`** — formatting is a lint gate. Run `pnpm format` at the repo root when lint fails on style.
 - `tsconfig.json` extends `../tsconfig.base.json`: strict, `noUnusedLocals`, `noUnusedParameters`, `isolatedModules`, bundler module resolution, types `vitest/globals` + `@testing-library/jest-dom`.
 - Docker: multi-stage `Dockerfile` — node build stage receives each `VITE_*` as `ARG`→`ENV` (they are baked into the bundle), builds `shared` then `webapp`; runtime stage is nginx serving `dist/` with SPA fallback (`try_files … /index.html`) and a `/api/` reverse proxy to the API container.
 

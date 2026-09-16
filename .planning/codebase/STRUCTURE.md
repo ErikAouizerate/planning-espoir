@@ -6,9 +6,10 @@
 
 ```
 planning-espoir/
-├── package.json            # Root: yarn workspaces (shared, api, webapp) + orchestration scripts
+├── package.json            # Root: packageManager pin + orchestration scripts
+├── pnpm-workspace.yaml     # pnpm workspaces (shared, api, webapp) + supply-chain settings
 ├── tsconfig.base.json      # Shared TS compiler options (ES2022, strict, commonjs)
-├── yarn.lock
+├── pnpm-lock.yaml
 ├── .env                    # Single root env for BOTH apps (gitignored; see .env.example)
 ├── .env.example            # Documents API + VITE_* variables
 ├── .gitlab-ci.yml          # CI: install → lint ∥ build → test → deploy (curl webhook)
@@ -214,7 +215,7 @@ planning-espoir/
 - Generic interactions (e.g. click-outside): `webapp/src/hooks/`
 
 **New shared domain type:**
-- Add to `shared/src/types.ts`, then **rebuild** — `yarn workspace @planning-espoir/shared build` — because api/webapp consume `dist/`; stale types otherwise break typecheck/tests
+- Add to `shared/src/types.ts`, then **rebuild** — `pnpm --filter @planning-espoir/shared run build` — because api/webapp consume `dist/`; stale types otherwise break typecheck/tests
 
 **New utility function:**
 - Frontend-only: `webapp/src/utils/` (date/format helpers like `webapp/src/utils/dates.ts`)

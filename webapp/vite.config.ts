@@ -66,9 +66,9 @@ export default defineConfig({
   server: {
     host: true,
     port: 5174,
-    proxy: {
-      '/api': 'http://localhost:3000',
-    },
+    // The API is called cross-origin (VITE_API_BASE) — no dev proxy. Allow the
+    // Caddy-proxied hostname so Vite's host check accepts it.
+    allowedHosts: ['planning-espoir.localhost'],
   },
   test: {
     environment: 'jsdom',

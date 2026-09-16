@@ -19,12 +19,12 @@ Two separate stacks, one per package:
 
 **Run Commands (from repo root):**
 ```bash
-yarn test                          # builds shared, then api + webapp tests
-yarn workspace @planning-espoir/api test -- parser     # single api unit test file (jest --runInBand with name filter)
-yarn workspace @planning-espoir/api test:e2e           # api e2e suite (jest --config ./test/jest-e2e.json --runInBand)
-yarn workspace @planning-espoir/webapp test -- src/utils/dates.spec.ts   # single webapp test file (vitest run)
+pnpm test                          # builds shared, then api + webapp tests
+pnpm --filter @planning-espoir/api run test -- parser     # single api unit test file (jest --runInBand with name filter)
+pnpm --filter @planning-espoir/api run test:e2e           # api e2e suite (jest --config ./test/jest-e2e.json --runInBand)
+pnpm --filter @planning-espoir/webapp run test -- src/utils/dates.spec.ts   # single webapp test file (vitest run)
 ```
-CI (`.gitlab-ci.yml`) runs `yarn test` in the `test` stage, gated behind `lint` and `build`. The API e2e suite is self-contained (sets `AUTH_ENABLED=false`, temp `DATA_DIR`) — no external services needed.
+CI (`.gitlab-ci.yml`) runs `pnpm test` in the `test` stage, gated behind `lint` and `build`. The API e2e suite is self-contained (sets `AUTH_ENABLED=false`, temp `DATA_DIR`) — no external services needed.
 
 ## Test File Organization
 
@@ -193,7 +193,7 @@ const parsed = await parsePlanning(await buildPlanningBuffer(), 'plan.xlsx');
 
 **View Coverage (manual):**
 ```bash
-yarn workspace @planning-espoir/api exec jest --runInBand --coverage   # writes api/coverage/
+pnpm --filter @planning-espoir/api exec jest --runInBand --coverage   # writes api/coverage/
 # vitest: npx vitest run --coverage in webapp/ (requires @vitest/coverage-v8, not installed)
 ```
 

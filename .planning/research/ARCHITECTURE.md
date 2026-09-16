@@ -57,7 +57,7 @@ Four integration patterns for the existing brownfield monorepo (`shared/` types-
 | `api/src/main.ts` | Bootstrap; gains restricted CORS instead of bare `enableCors()` | `enableCors({ origin: [...], credentials: true })` from `CORS_ORIGINS` env |
 | `webapp/nginx.conf` | Prod edge; gains CSP header, `client_max_body_size`, `X-Forwarded-For` | `add_header Content-Security-Policy ...; client_max_body_size 11m;` at server level |
 | `webapp/src/api/client.ts` | Fetch wrapper; gains 413 mapping to a French message + pre-upload `file.size` check | Check size client-side before POST; parse `message` from error body |
-| `shared/package.json` | Gains a test runner (vitest) for the pure date math | Smallest runner that works in a workspace; root `yarn test` already builds shared first |
+| `shared/package.json` | Gains a test runner (vitest) for the pure date math | Smallest runner that works in a workspace; root `pnpm test` already builds shared first |
 
 ## Recommended Project Structure (deltas only)
 

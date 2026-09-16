@@ -53,10 +53,10 @@
 - Fix approach: Move date-rotation helpers into `@planning-espoir/shared` (builds to `dist/`, already consumed by both).
 
 **Docker runtime image ships devDependencies:**
-- Issue: The runtime stage copies the full `node_modules` from the build stage without `yarn install --production` pruning (`api/Dockerfile:16`).
+- Issue: The runtime stage copies the full `node_modules` (root and `api/`) from the build stage without a production-only install (`api/Dockerfile`).
 - Files: `api/Dockerfile`
 - Impact: Larger image (~hundreds of MB), more attack surface (jest, ts-node, nest CLI, typescript in prod).
-- Fix approach: `yarn install --production --frozen-lockfile` in the runtime stage (or `npm prune --omit=dev` equivalent), or a multi-stage install.
+- Fix approach: a `prod-deps` stage running `pnpm install --frozen-lockfile --prod`, or `pnpm deploy`; copy only the production tree into the runtime stage.
 
 ## Known Bugs
 
@@ -172,7 +172,7 @@
 
 **Stale `shared/dist` types (workspace build order):**
 - Files: `shared/package.json` (`main: dist/index.js`), root `package.json` scripts
-- Why fragile: `api`/`webapp` consume `@planning-espoir/shared` from `dist/`; editing `shared/src/types.ts` without rebuilding silently typechecks against stale types (root scripts build first, but `yarn workspace … test`/`typecheck` invoked directly do not). Documented in `AGENTS.md`, still a footgun.
+- Why fragile: `api`/`webapp` consume `@planning-espoir/shared` from `dist/`; editing `shared/src/types.ts` without rebuilding silently typechecks against stale types (root scripts build first, but `pnpm --filter … run test`/`typecheck` invoked directly do not). Documented in `AGENTS.md`, still a footgun.
 
 **Webapp PWA cache vs. freshness promise:**
 - Files: `webapp/vite.config.ts:43-58`

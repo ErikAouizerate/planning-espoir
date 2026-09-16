@@ -8,7 +8,9 @@ Planning Espoir is a single-page app with a React + Vite frontend, a NestJS API,
 
 ## Decision
 
-Use a yarn-workspaces monorepo with three workspaces: `shared/` (cross-package domain types), `api/` (NestJS backend), `webapp/` (React + Vite SPA), declared in a root `package.json`. Deployment is via Docker + docker-compose. There is no database: state lives in flat files under a `DATA_DIR`. Keycloak OIDC authentication is designed for but not implemented yet.
+Use a pnpm-workspaces monorepo with three workspaces: `shared/` (cross-package domain types), `api/` (NestJS backend), `webapp/` (React + Vite SPA), declared in `pnpm-workspace.yaml` with the package manager pinned in the root `package.json` (`packageManager`). Deployment is via Docker + docker-compose. There is no database: state lives in flat files under a `DATA_DIR`. Keycloak OIDC authentication is designed for but not implemented yet.
+
+The monorepo initially used yarn workspaces and was migrated to pnpm (ADR-0009). pnpm ships supply-chain controls — `minimumReleaseAge`, `strictDepBuilds`, `allowBuilds` — configured in `pnpm-workspace.yaml`.
 
 ## Consequences
 

@@ -45,7 +45,7 @@
 
 **Formatting:**
 - Prettier 3.9.6, config at `.prettierrc`: `printWidth: 100`, `singleQuote: true`, `trailingComma: "all"`, `semi: true`, `tabWidth: 2`
-- Run `yarn format` (prettier --write) from repo root when lint fails on style — `prettier/prettier: error` makes formatting part of lint
+- Run `pnpm format` (prettier --write) from repo root when lint fails on style — `prettier/prettier: error` makes formatting part of lint
 
 **Linting:**
 - ESLint 9 flat config, one per package: `api/eslint.config.mjs`, `webapp/eslint.config.mjs`

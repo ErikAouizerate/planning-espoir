@@ -36,7 +36,7 @@
 
 ```bash
 # New runtime deps (api only) — deliberately small
-yarn workspace @planning-espoir/api add @nestjs/throttler@^6.5.0 helmet@^8.3.0
+pnpm --filter @planning-espoir/api add @nestjs/throttler@^6.5.0 helmet@^8.3.0
 
 # No new webapp or shared deps for this milestone:
 #  - date math: built-in Date + Intl.DateTimeFormat, pure helpers in shared/

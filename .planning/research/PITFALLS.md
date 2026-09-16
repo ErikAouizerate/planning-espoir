@@ -246,7 +246,7 @@ Domain-specific security issues beyond general web security.
 | Health behind the global auth guard | Monitors/LB probes 401; deploy verification blind | `@Public()` decorator + Reflector check in the guard |
 | JWKS fetched over `http://` | MITM can substitute keys and forge tokens | Validate the issuer scheme at startup; fail closed |
 | No rate limiting on upload | Disk fill / CPU exhaustion via repeated uploads | `@nestjs/throttler` on upload + config routes (or nginx `limit_req`) |
-| Runtime image with devDependencies | Bigger attack surface (ts-node, jest, CLI in prod) | `yarn install --production` in the runtime stage |
+| Runtime image with devDependencies | Bigger attack surface (ts-node, jest, CLI in prod) | `pnpm install --prod` in the runtime stage |
 
 ## UX Pitfalls
 

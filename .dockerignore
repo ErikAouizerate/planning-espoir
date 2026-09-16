@@ -5,3 +5,6 @@ data
 .git
 docs
 *.log
+.pnpm-store
+.superpowers
+.planning

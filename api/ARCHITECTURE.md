@@ -80,7 +80,7 @@ One Nest module per feature domain, in its own folder: `<feature>.module.ts`, `<
 ## Tooling & quality gates
 
 - Scripts: `build` (`nest build`), `start:dev` (`nest start --watch`), `test` (unit), `test:e2e`, `lint`, `typecheck`. Root equivalents orchestrate all workspaces (see root `AGENTS.md`).
-- ESLint flat config: `typescript-eslint` recommended + `eslint-plugin-prettier` with **`prettier/prettier: error`** — formatting is a lint gate. Run `yarn format` at the repo root when lint fails on style.
+- ESLint flat config: `typescript-eslint` recommended + `eslint-plugin-prettier` with **`prettier/prettier: error`** — formatting is a lint gate. Run `pnpm format` at the repo root when lint fails on style.
 - `tsconfig.json` extends `../tsconfig.base.json` (strict): `commonjs`, `experimentalDecorators` + `emitDecoratorMetadata`, `sourceMap`, a `paths` shim for `jose/errors` types.
 - Docker: multi-stage `Dockerfile` — build stage installs the whole workspace (`--frozen-lockfile`) then builds `shared` → `api`; runtime stage copies root `node_modules` + `shared` + `api` and runs `node api/dist/main.js` with `NODE_ENV=production`. Runtime data persists in a mounted volume over the API's `DATA_DIR` (see root `docker-compose.yml`).
 

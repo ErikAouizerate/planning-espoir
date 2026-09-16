@@ -8,3 +8,11 @@ data/
 .env.*
 !.env.example
 !.env.prod.example
+
+# pnpm
+.pnpm-store/
+pnpm-debug.log*
+
+# superpowers working artifacts — generated locally, never committed
+.superpowers/
+docs/superpowers/plans/

@@ -11,7 +11,7 @@
     "types": ["node", "jest"],
     "baseUrl": "./",
     "paths": {
-      "jose/errors": ["../node_modules/jose/dist/types/util/errors.d.ts"]
+      "jose/errors": ["node_modules/jose/dist/types/util/errors.d.ts"]
     }
   },
   "include": ["src", "test"],

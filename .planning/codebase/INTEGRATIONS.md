@@ -48,7 +48,7 @@
 - Self-hosted Docker via `docker-compose.yml`: api (node:22-alpine) + webapp (nginx:alpine, host port 8083); nginx proxies `/api` → `api:3000` (`webapp/nginx.conf`). API data persisted in `api-data` volume.
 
 **CI Pipeline:**
-- GitLab CI (`.gitlab-ci.yml`): `node:22-alpine`, cache on `node_modules` + `dist` dirs; stages: install (`yarn install --frozen-lockfile`) → lint ∥ build → test → deploy (`main` only).
+- GitLab CI (`.gitlab-ci.yml`): `node:22-alpine`, cache on the pnpm store (`.pnpm-store/`); stages: install (`pnpm install --frozen-lockfile`) → lint ∥ build → test → deploy (`main` only).
 - Deploy trigger: curl POST to `DEPLOY_WEBHOOK_URL` (GitLab CI variable) with a simulated GitLab push-hook JSON payload (`.gitlab-ci.yml:63-68`).
 
 ## Environment Configuration

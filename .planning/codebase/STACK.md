@@ -18,7 +18,7 @@
 - Node.js 22 (LTS) — pinned via `node:22-alpine` in `.gitlab-ci.yml`, `api/Dockerfile`, `webapp/Dockerfile`. No `.nvmrc` / `.node-version` in repo. Types target `@types/node ^26` (api devDependencies).
 
 **Package Manager:**
-- Yarn Classic (v1) — `yarn.lock` present at repo root; no `.yarnrc.yml` / corepack config. Workspaces monorepo defined in root `package.json` (`shared`, `api`, `webapp`).
+- pnpm 11 (pinned via `packageManager: pnpm@11.18.0` in root `package.json`) — `pnpm-lock.yaml` + `pnpm-workspace.yaml` at the repo root (`shared`, `api`, `webapp`), with supply-chain settings (`minimumReleaseAge`, `strictDepBuilds`, `allowBuilds`).
 
 ## Frameworks
 
@@ -36,9 +36,9 @@
 
 **Build/Dev:**
 - `@nestjs/cli` ^11.0.24 — `nest build` / `nest start --watch`
-- `concurrently` ^10.0.4 — root `yarn dev` runs api + webapp together (root `package.json`)
+- `concurrently` ^10.0.4 — root `pnpm dev` runs api + webapp together (root `package.json`)
 - ESLint ^9 (flat config) + `typescript-eslint` ^8.65.0 + `eslint-plugin-prettier` — separate configs `api/eslint.config.mjs`, `webapp/eslint.config.mjs`
-- Prettier 3.9.6 — formatting enforced via `prettier/prettier: error`; root `yarn format`
+- Prettier 3.9.6 — formatting enforced via `prettier/prettier: error`; root `pnpm format`
 - TypeScript config: shared base `tsconfig.base.json` (target ES2022, module commonjs, strict)
 
 ## Key Dependencies
@@ -72,7 +72,7 @@
 ## Platform Requirements
 
 **Development:**
-- Node.js 22 + Yarn Classic; `yarn dev` builds `shared` first, then runs api (port 3000, `--watch`) and webapp (port 5174, proxies `/api` → `localhost:3000`) concurrently
+- Node.js 22 + pnpm 11; `pnpm dev` builds `shared` first, then runs api (port 3000, `--watch`) and webapp (port 5174) concurrently. The webapp calls the API cross-origin via `VITE_API_BASE` (no Vite dev proxy); containerized dev runs behind Caddy (`docker-compose.override.yml`)
 - Keycloak optional: `AUTH_ENABLED=false` + `VITE_AUTH_ENABLED=false` yields mock user `test-user` with guard off
 
 **Production:**

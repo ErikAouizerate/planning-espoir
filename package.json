@@ -1,20 +1,19 @@
 {
   "name": "planning-espoir",
   "private": true,
-  "workspaces": [
-    "shared",
-    "api",
-    "webapp"
-  ],
+  "packageManager": "pnpm@11.18.0",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "build": "yarn workspace @planning-espoir/shared build && yarn workspace @planning-espoir/api build && yarn workspace @planning-espoir/webapp build",
-    "dev": "yarn workspace @planning-espoir/shared build && concurrently -k \"yarn workspace @planning-espoir/api start:dev\" \"yarn workspace @planning-espoir/webapp dev\"",
-    "test": "yarn workspace @planning-espoir/shared build && yarn workspace @planning-espoir/api test && yarn workspace @planning-espoir/webapp test",
-    "lint": "yarn workspace @planning-espoir/api lint && yarn workspace @planning-espoir/webapp lint",
-    "typecheck": "yarn workspace @planning-espoir/shared build && yarn workspace @planning-espoir/api typecheck && yarn workspace @planning-espoir/webapp typecheck",
+    "build": "pnpm --filter @planning-espoir/shared run build && pnpm --filter @planning-espoir/api run build && pnpm --filter @planning-espoir/webapp run build",
+    "dev": "pnpm --filter @planning-espoir/shared run build && concurrently -k \"pnpm --filter @planning-espoir/api run start:dev\" \"pnpm --filter @planning-espoir/webapp run dev\"",
+    "test": "pnpm --filter @planning-espoir/shared run build && pnpm --filter @planning-espoir/api run test && pnpm --filter @planning-espoir/webapp run test",
+    "lint": "pnpm --filter @planning-espoir/api run lint && pnpm --filter @planning-espoir/webapp run lint",
+    "typecheck": "pnpm --filter @planning-espoir/shared run build && pnpm --filter @planning-espoir/api run typecheck && pnpm --filter @planning-espoir/webapp run typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,mjs,json,yml,yaml,md,html,css}\" --ignore-unknown",
     "format:check": "prettier --check \"**/*.{ts,tsx,mjs,json,yml,yaml,md,html,css}\" --ignore-unknown",
-    "install:clean": "yarn install"
+    "install:clean": "pnpm install"
   },
   "devDependencies": {
     "concurrently": "^10.0.4",

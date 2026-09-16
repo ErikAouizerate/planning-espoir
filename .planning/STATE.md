@@ -79,8 +79,8 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-08
-Stopped at: Docker dev setup behind Traefik done; prod regression fixed and committed.
+Last session: 2026-09-16
+Stopped at: Migrated to pnpm; local dev reconfigured behind Caddy with a cross-origin API (docker-compose.override.yml); base compose now uses expose.
 Resume file: None
 
 ## ⚠️ À FINIR — debug prod (pas encore déployé/vérifié)
@@ -184,3 +184,43 @@ docker compose -f docker-compose.dev.yml up --build
   "redirects to the gateway URL on a 403 when auth is enabled" fails on `main`
   too (expects `http://localhost:5173`). Unrelated to this work; not yet fixed.
 - `.claude/settings.local.json` is untracked local config — do not commit.
+
+---
+
+## Session Log — 2026-09-16 (pnpm migration + Caddy local dev)
+
+### What was done
+
+- **pnpm migration (ADR-0009)**: `pnpm-workspace.yaml` (packages + supply-chain
+  settings + overrides), root `package.json` (`packageManager: pnpm@11.18.0`,
+  scripts via `pnpm --filter`), `workspace:*` for `@planning-espoir/shared`,
+  `yarn.lock` → `pnpm-lock.yaml`. Dockerfiles and `.gitlab-ci.yml` moved to pnpm
+  (CI caches `.pnpm-store`, not `node_modules`).
+  - `api/jest.config.ts`: `transformIgnorePatterns` now matches jose under the
+    pnpm store nesting (`node_modules/.pnpm/<pkg>/node_modules/jose`).
+  - `trustPolicy: no-downgrade` intentionally omitted (false positives).
+  - Note (this VM only): the pnpm store must live on a SQLite-capable filesystem;
+    the default `/workspace/.pnpm-store` (virtiofs) fails with `disk I/O error`.
+    Install with `pnpm install --store-dir ~/.local/share/pnpm/store`.
+- **Cross-origin API (ADR-0010)**: removed the Vite dev proxy, added
+  `VITE_API_BASE` (fallback `|| '/api'`) to `webapp/src/api/client.ts`, tests for
+  configured/empty base, `server.allowedHosts` for the Caddy hostname.
+- **Compose**: base `docker-compose.yml` uses `expose` (no host ports, Dokploy
+  routes via Traefik); new `docker-compose.override.yml` runs dev targets with
+  hot reload behind Caddy —
+  `http://planning-espoir.localhost` (webapp 5174) and
+  `http://api.planning-espoir.localhost` (api 3000) — on the external
+  `local-proxy` network, with `CORS_ORIGINS=http://planning-espoir.localhost`.
+
+### How to run dev
+
+```sh
+docker compose up --build
+# requires the shared Caddy proxy (external `local-proxy` network)
+# UI: http://planning-espoir.localhost   API: http://api.planning-espoir.localhost
+```
+
+### Follow-ups
+
+- Whitelist redirect URI `http://planning-espoir.localhost/*` for the client in
+  the `gateway` repository (Keycloak realm).

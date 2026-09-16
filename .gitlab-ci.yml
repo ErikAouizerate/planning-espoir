@@ -6,22 +6,26 @@ stages:
 
 image: node:22-alpine
 
+variables:
+  PNPM_STORE_DIR: .pnpm-store
+
+default:
+  before_script:
+    - npm install --global pnpm@11.18.0
+
+# pnpm store is content-addressable: caching it (rather than node_modules,
+# whose symlinks do not survive artifact transfer) makes installs fast.
 cache: &cache
-  key: ${CI_COMMIT_REF_SLUG}
+  key:
+    files:
+      - pnpm-lock.yaml
   paths:
-    - node_modules/
-    - shared/dist/
-    - api/dist/
-    - webapp/dist/
+    - .pnpm-store/
 
 install:
   stage: prepare
   script:
-    - yarn install --frozen-lockfile
-  artifacts:
-    paths:
-      - node_modules/
-    expire_in: 1h
+    - pnpm install --frozen-lockfile --store-dir "$PNPM_STORE_DIR"
   cache:
     <<: *cache
     policy: pull-push
@@ -30,7 +34,8 @@ lint:
   stage: build
   needs: [install]
   script:
-    - yarn lint
+    - pnpm install --frozen-lockfile --store-dir "$PNPM_STORE_DIR"
+    - pnpm lint
   cache:
     <<: *cache
     policy: pull
@@ -39,7 +44,8 @@ build:
   stage: build
   needs: [install]
   script:
-    - yarn build
+    - pnpm install --frozen-lockfile --store-dir "$PNPM_STORE_DIR"
+    - pnpm build
   cache:
     <<: *cache
     policy: pull-push
@@ -48,7 +54,8 @@ test:
   stage: test
   needs: [lint, build]
   script:
-    - yarn test
+    - pnpm install --frozen-lockfile --store-dir "$PNPM_STORE_DIR"
+    - pnpm test
   cache:
     <<: *cache
     policy: pull
@@ -57,6 +64,8 @@ deploy:
   stage: deploy
   image: curlimages/curl
   needs: [test]
+  # No Node/pnpm in this image; skip the default before_script.
+  before_script: []
   variables:
     GIT_STRATEGY: none
   script:

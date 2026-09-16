@@ -22,6 +22,7 @@ describe('api client', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
   });
 
   it('fetchPlanning calls GET /api/planning and returns JSON', async () => {
@@ -36,6 +37,29 @@ describe('api client', () => {
     vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify(body), { status: 200 }));
     await expect(fetchSchedule('2026-08')).resolves.toEqual(body);
     expect(fetch).toHaveBeenCalledWith('/api/planning/schedule?month=2026-08', expect.any(Object));
+  });
+
+  it('prefixes API calls with VITE_API_BASE when configured', async () => {
+    vi.resetModules();
+    vi.stubEnv('VITE_API_BASE', 'http://api.planning-espoir.localhost/api');
+    const body = { startDate: null, people: [], warnings: [] };
+    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify(body), { status: 200 }));
+    const { fetchPlanning: freshFetchPlanning } = await import('./client');
+    await expect(freshFetchPlanning()).resolves.toEqual(body);
+    expect(fetch).toHaveBeenCalledWith(
+      'http://api.planning-espoir.localhost/api/planning',
+      expect.any(Object),
+    );
+  });
+
+  it('falls back to the relative /api base when VITE_API_BASE is empty', async () => {
+    vi.resetModules();
+    vi.stubEnv('VITE_API_BASE', '');
+    const body = { startDate: null, people: [], warnings: [] };
+    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify(body), { status: 200 }));
+    const { fetchPlanning: freshFetchPlanning } = await import('./client');
+    await expect(freshFetchPlanning()).resolves.toEqual(body);
+    expect(fetch).toHaveBeenCalledWith('/api/planning', expect.any(Object));
   });
 
   it('throws an Error with the server message on failure', async () => {
@@ -78,6 +102,7 @@ describe('api client', () => {
 
   it('redirects to the gateway URL on a 403 when auth is enabled', async () => {
     vi.resetModules();
+    vi.stubEnv('VITE_GATEWAY_URL', 'http://gateway.example');
     isEnabledMock.mockReturnValue(true);
     vi.mocked(fetch).mockResolvedValue(
       new Response(JSON.stringify({ statusCode: 403, message: 'Forbidden' }), { status: 403 }),
@@ -91,7 +116,7 @@ describe('api client', () => {
     });
     try {
       await expect(freshFetchPlanning()).rejects.toThrow('Forbidden');
-      expect(assignSpy).toHaveBeenCalledWith('http://localhost:5173');
+      expect(assignSpy).toHaveBeenCalledWith('http://gateway.example');
     } finally {
       Object.defineProperty(window, 'location', { value: originalLocation, writable: true });
     }

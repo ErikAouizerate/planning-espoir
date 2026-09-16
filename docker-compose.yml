@@ -1,3 +1,6 @@
+# docker-compose.yml — production stack, deployed as-is by Dokploy.
+# No host ports are published here: Dokploy's reverse proxy (Traefik) routes to
+# the exposed container ports. Local development uses docker-compose.override.yml.
 services:
   api:
     build:
@@ -8,6 +11,8 @@ services:
       - DATA_DIR=/data
     volumes:
       - api-data:/data
+    expose:
+      - '3000'
     networks:
       - planning-net
     restart: unless-stopped
@@ -23,8 +28,8 @@ services:
         VITE_KEYCLOAK_CLIENT_ID: ${VITE_KEYCLOAK_CLIENT_ID}
         VITE_GATEWAY_URL: ${VITE_GATEWAY_URL}
         VITE_APP_GROUP: ${VITE_APP_GROUP}
-    ports:
-      - '8083:80'
+    expose:
+      - '8080'
     depends_on:
       - api
     networks:

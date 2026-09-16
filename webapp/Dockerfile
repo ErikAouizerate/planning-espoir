@@ -1,4 +1,25 @@
-FROM node:22-alpine AS build
+FROM node:22-alpine AS base
+WORKDIR /app
+RUN npm install --global pnpm@11.18.0
+
+FROM base AS deps
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
+COPY shared/package.json shared/
+COPY api/package.json api/
+COPY webapp/package.json webapp/
+RUN pnpm install --frozen-lockfile
+
+# Hot-reload stage used by docker-compose.override.yml (sources are bind-mounted).
+# Runs as `node` (UID 1000, matches the host user) so files written into the
+# bind-mounted tree are not root-owned.
+FROM deps AS dev
+COPY shared shared
+RUN pnpm --filter @planning-espoir/shared run build \
+    && chown -R node:node /app
+USER node
+CMD ["pnpm", "--filter", "@planning-espoir/webapp", "run", "dev"]
+
+FROM deps AS build
 
 ARG VITE_AUTH_ENABLED
 ARG VITE_KEYCLOAK_URL
@@ -14,17 +35,14 @@ ENV VITE_AUTH_ENABLED=$VITE_AUTH_ENABLED \
     VITE_GATEWAY_URL=$VITE_GATEWAY_URL \
     VITE_APP_GROUP=$VITE_APP_GROUP
 
-WORKDIR /app
-COPY package.json yarn.lock tsconfig.base.json ./
-COPY shared/package.json shared/
-COPY api/package.json api/
-COPY webapp/package.json webapp/
-RUN yarn install --frozen-lockfile
 COPY shared shared
 COPY webapp webapp
-RUN yarn workspace @planning-espoir/shared build && yarn workspace @planning-espoir/webapp build
+RUN pnpm --filter @planning-espoir/shared run build && pnpm --filter @planning-espoir/webapp run build
 
-FROM nginx:alpine AS runtime
+FROM nginxinc/nginx-unprivileged:alpine AS runtime
 COPY webapp/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/webapp/dist /usr/share/nginx/html
-EXPOSE 80
+EXPOSE 8080
+USER nginx
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget -q -O /dev/null http://127.0.0.1:8080/ || exit 1
