@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs';
-import { join } from 'path';
 import type { Config, Person, ParsingWarning } from '@planning-espoir/shared';
+
+const FILE_NAME_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
 export interface StoredPlanning {
   people: Person[];
@@ -11,7 +12,10 @@ export class Storage {
   constructor(private readonly dataDir: string) {}
 
   private file(name: string): string {
-    return join(this.dataDir, name);
+    if (!FILE_NAME_PATTERN.test(name)) {
+      throw new Error(`Invalid storage file name: ${name}`);
+    }
+    return `${this.dataDir.replace(/[\\/]+$/, '')}/${name}`;
   }
 
   async savePlanningXlsx(buffer: Buffer): Promise<void> {
