@@ -89,7 +89,8 @@ webapp/
 │   │   └── PWAUpdatePrompt.tsx  # Offline/update toast
 │   └── App.tsx                  # Includes <PWAUpdatePrompt />
 ├── vite.config.ts               # VitePWA plugin config
-├── package.json                 # + vite-plugin-pwa, @vite-pwa/assets-generator
+├── package.json                 # + vite-plugin-pwa, @vite-pwa/assets-generator,
+│                                #   workbox-build, workbox-window (peer deps)
 └── nginx.conf                   # + Service-Worker-Allowed header
 ```
 
@@ -101,8 +102,8 @@ webapp/
 
 ## Testing
 
-1. `yarn build` — verify `dist/manifest.webmanifest`, `dist/sw.js`, `dist/workbox-*.js` exist
-2. `yarn preview` — test in browser: DevTools → Application → Manifest + Service Workers
+1. `pnpm --filter @planning-espoir/webapp run build` — verify `dist/manifest.webmanifest`, `dist/sw.js`, `dist/workbox-*.js` exist
+2. `pnpm --filter @planning-espoir/webapp run preview` — test in browser: DevTools → Application → Manifest + Service Workers
 3. Offline test: DevTools → Application → Service Workers → Offline → reload → schedule loads
 4. Update test: rebuild, reload → "New content available" toast appears
 
